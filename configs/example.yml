@@ -1,41 +1,120 @@
 programs:
-  test_echo:
-    cmd: "echo 'Hello from taskmaster process'"
-    numprocs: 1
-    autostart: true
-    autorestart: never
-    exitcodes: [0]
-    starttime: 1
-    startretries: 3
-    stopsignal: TERM
-    stoptime: 5
-    stdout: /tmp/test_echo.stdout
-    stderr: /tmp/test_echo.stderr
-    env:
-      TEST_VAR: "hello_world"
-    workingdir: /tmp
-    umask: 022
-
-  long_running:
+  # Programa de prueba simple
+  test_program:
     cmd: "sleep 30"
     numprocs: 2
+    autostart: true
+    autorestart: unexpected
+    exitcodes: [0]
+    starttime: 3
+    startretries: 3
+    stopsignal: TERM
+    stoptime: 10
+    stdout: /tmp/test_program.stdout
+    stderr: /tmp/test_program.stderr
+    env:
+      TEST_VAR: "hello_world"
+      PROGRAM_NAME: "test_program"
+    workingdir: /tmp
+    umask: "022"
+
+  # Programa que genera output
+  logger_program:
+    cmd: "bash -c 'while true; do echo \"Log message at $(date)\"; sleep 5; done'"
+    numprocs: 1
     autostart: true
     autorestart: always
     exitcodes: [0]
     starttime: 2
-    startretries: 3
+    startretries: 5
     stopsignal: TERM
-    stoptime: 3
-    stdout: /tmp/long_running.stdout
-    stderr: /tmp/long_running.stderr
+    stoptime: 15
+    stdout: /tmp/logger.stdout
+    stderr: /tmp/logger.stderr
+    env:
+      LOG_LEVEL: "INFO"
+    workingdir: /tmp
+    umask: "022"
 
-  failing_process:
-    cmd: "sh -c 'echo failing && exit 1'"
+  # Programa que falla ocasionalmente
+  flaky_program:
+    cmd: "bash -c 'if [ $((RANDOM % 3)) -eq 0 ]; then echo \"Success\"; exit 0; else echo \"Failed\"; exit 1; fi'"
     numprocs: 1
     autostart: false
     autorestart: unexpected
     exitcodes: [0]
     starttime: 1
+    startretries: 3
+    stopsignal: INT
+    stoptime: 5
+    stdout: /tmp/flaky.stdout
+    stderr: /tmp/flaky.stderr
+    workingdir: /tmp
+    umask: "022"
+
+  # Programa con múltiples procesos
+  worker_pool:
+    cmd: "bash -c 'echo \"Worker $$ started\"; sleep $((10 + RANDOM % 20)); echo \"Worker $$ finished\"'"
+    numprocs: 4
+    autostart: true
+    autorestart: never
+    exitcodes: [0]
+    starttime: 2
     startretries: 2
     stopsignal: TERM
-    stoptime: 2
+    stoptime: 10
+    stdout: /tmp/worker_pool.stdout
+    stderr: /tmp/worker_pool.stderr
+    env:
+      WORKER_TYPE: "background"
+      MAX_TASKS: "100"
+    workingdir: /tmp
+    umask: "077"
+
+  # Programa con señal personalizada
+  custom_signal_program:
+    cmd: "bash -c 'trap \"echo Received USR1; exit 0\" USR1; echo \"Started with PID $$\"; while true; do sleep 1; done'"
+    numprocs: 1
+    autostart: false
+    autorestart: unexpected
+    exitcodes: [0]
+    starttime: 3
+    startretries: 2
+    stopsignal: USR1
+    stoptime: 20
+    stdout: /tmp/custom_signal.stdout
+    stderr: /tmp/custom_signal.stderr
+    workingdir: /tmp
+    umask: "022"
+
+  # Programa que nunca se reinicia
+  one_shot_program:
+    cmd: "echo 'One-shot task executed'; date"
+    numprocs: 1
+    autostart: false
+    autorestart: never
+    exitcodes: [0]
+    starttime: 1
+    startretries: 1
+    stopsignal: TERM
+    stoptime: 5
+    stdout: /tmp/oneshot.stdout
+    stderr: /tmp/oneshot.stderr
+    workingdir: /tmp
+    umask: "022"
+
+  # Programa con salida descartada
+  silent_program:
+    cmd: "bash -c 'while true; do echo \"This will be discarded\"; sleep 2; done'"
+    numprocs: 1
+    autostart: false
+    autorestart: always
+    exitcodes: [0]
+    starttime: 1
+    startretries: 3
+    stopsignal: KILL
+    stoptime: 5
+    stdout: /dev/null
+    stderr: /dev/null
+    workingdir: /tmp
+    umask: "022"

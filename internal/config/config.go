@@ -16,15 +16,15 @@ type Program struct {
 	AutoStart    bool              `yaml:"autostart"`
 	AutoRestart  string            `yaml:"autorestart"` // always, never, unexpected
 	ExitCodes    []int             `yaml:"exitcodes"`
-	StartTime    int               `yaml:"starttime"` // seconds
-	StartRetries int               `yaml:"startretries"`
-	StopSignal   string            `yaml:"stopsignal"` // TERM, KILL, USR1, etc.
-	StopTime     int               `yaml:"stoptime"`   // seconds
-	Stdout       string            `yaml:"stdout"`
-	Stderr       string            `yaml:"stderr"`
-	Env          map[string]string `yaml:"env"`
-	WorkingDir   string            `yaml:"workingdir"`
-	Umask        string            `yaml:"umask"`
+	StartTime    int               `yaml:"starttime"`    // seconds to consider "successfully started"
+	StartRetries int               `yaml:"startretries"` // max restart attempts
+	StopSignal   string            `yaml:"stopsignal"`   // TERM, KILL, USR1, etc.
+	StopTime     int               `yaml:"stoptime"`     // seconds to wait before KILL
+	Stdout       string            `yaml:"stdout"`       // stdout redirection
+	Stderr       string            `yaml:"stderr"`       // stderr redirection
+	Env          map[string]string `yaml:"env"`          // environment variables
+	WorkingDir   string            `yaml:"workingdir"`   // working directory
+	Umask        string            `yaml:"umask"`        // umask for process
 }
 
 func Load(filename string) (*Config, error) {
@@ -61,6 +61,9 @@ func Load(filename string) (*Config, error) {
 		}
 		if len(program.ExitCodes) == 0 {
 			program.ExitCodes = []int{0}
+		}
+		if program.Umask == "" {
+			program.Umask = "022"
 		}
 
 		// Actualizar el mapa con los valores por defecto
