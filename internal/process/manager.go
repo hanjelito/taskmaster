@@ -30,6 +30,7 @@ type ProcessInstance struct {
 	ExitCode     int
 	RestartCount int
 	StopChan     chan bool
+	ManualStop   bool
 }
 
 type ProcessState int
@@ -96,6 +97,8 @@ func (m *Manager) StartAutoStartProcesses() error {
 	return nil
 }
 
+// REEMPLAZAR el método StartProgram existente con esta versión:
+
 func (m *Manager) StartProgram(name string) error {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
@@ -105,21 +108,14 @@ func (m *Manager) StartProgram(name string) error {
 		return fmt.Errorf("program %s not found in configuration", name)
 	}
 
-	// Verificar si ya está ejecutándose
-	if instances, running := m.processes[name]; running && len(instances) > 0 {
-		return fmt.Errorf("program %s is already running", name)
+	// Verificar si hay procesos activos usando el método auxiliar
+	hasActive, activeCount := m.HasActiveProcesses(name)
+	if hasActive {
+		return fmt.Errorf("program %s has %d active processes running", name, activeCount)
 	}
 
-	// Limpiar procesos terminados del slice anterior
-	if instances, exists := m.processes[name]; exists {
-		activeInstances := []*ProcessInstance{}
-		for _, instance := range instances {
-			if instance.State == StateRunning || instance.State == StateStarting || instance.State == StateRestarting {
-				activeInstances = append(activeInstances, instance)
-			}
-		}
-		m.processes[name] = activeInstances
-	}
+	// Limpiar automáticamente procesos muertos
+	m.AutoCleanupProgram(name)
 
 	// Crear configuración de proceso
 	processConfig := &ProcessConfig{
@@ -163,6 +159,8 @@ func (m *Manager) StartProgram(name string) error {
 }
 
 func (m *Manager) startProcessInstance(instance *ProcessInstance, programName string) error {
+	// ✅ RESETEAR la bandera de parada manual al iniciar
+	instance.ManualStop = false
 	// Crear comando con umask si se especifica
 	var cmd *exec.Cmd
 
@@ -258,7 +256,14 @@ func (m *Manager) monitorProcess(instance *ProcessInstance, programName string) 
 		m.logger.Info("Process %s exited normally", instance.Name)
 	}
 
-	// Determinar si se debe reiniciar
+	// ✅ NUEVA LÓGICA: Si fue parada manual, no reiniciar
+	if instance.ManualStop {
+		m.logger.Info("Process %s was manually stopped, not restarting", instance.Name)
+		instance.State = StateStopped
+		return
+	}
+
+	// Determinar si se debe reiniciar (solo si NO fue parada manual)
 	shouldRestart := m.shouldRestart(instance, exitCode)
 
 	if shouldRestart && instance.RestartCount < instance.Config.StartRetries {
@@ -315,6 +320,9 @@ func (m *Manager) StopProgram(name string) error {
 
 	for _, instance := range instances {
 		if instance.Cmd != nil && instance.Cmd.Process != nil {
+			// ✅ MARCAR COMO PARADA MANUAL
+			instance.ManualStop = true
+
 			// Señalar al proceso que se detenga
 			select {
 			case instance.StopChan <- true:
@@ -337,7 +345,9 @@ func (m *Manager) StopProgram(name string) error {
 		instance.State = StateStopped
 	}
 
-	delete(m.processes, name)
+	// ✅ NO eliminar del mapa, mantener como STOPPED
+	// delete(m.processes, name) // REMOVER ESTA LÍNEA
+
 	return nil
 }
 
@@ -589,5 +599,50 @@ func (m *Manager) CleanupProgram(name string) {
 		if cleaned > 0 {
 			m.logger.Info("Cleaned up %d dead instances for program %s", cleaned, name)
 		}
+	}
+}
+
+// HasActiveProcesses verifica si un programa tiene procesos activos
+func (m *Manager) HasActiveProcesses(programName string) (bool, int) {
+	instances, exists := m.processes[programName]
+	if !exists {
+		return false, 0
+	}
+
+	activeCount := 0
+	for _, instance := range instances {
+		if instance.State == StateRunning || instance.State == StateStarting || instance.State == StateRestarting {
+			activeCount++
+		}
+	}
+
+	return activeCount > 0, activeCount
+}
+
+// AutoCleanupProgram limpia automáticamente procesos muertos de un programa específico
+func (m *Manager) AutoCleanupProgram(programName string) {
+	instances, exists := m.processes[programName]
+	if !exists {
+		return
+	}
+
+	activeInstances := []*ProcessInstance{}
+	cleanedCount := 0
+
+	for _, instance := range instances {
+		if instance.State == StateRunning || instance.State == StateStarting || instance.State == StateRestarting {
+			activeInstances = append(activeInstances, instance)
+		} else {
+			cleanedCount++
+		}
+	}
+
+	if cleanedCount > 0 {
+		if len(activeInstances) == 0 {
+			delete(m.processes, programName)
+		} else {
+			m.processes[programName] = activeInstances
+		}
+		m.logger.Info("Auto-cleaned %d dead instances for program %s", cleanedCount, programName)
 	}
 }
