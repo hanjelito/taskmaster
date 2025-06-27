@@ -1,0 +1,15 @@
+programs:
+  nginx_sim:
+    cmd: "sleep 30"
+    numprocs: 2
+    autostart: true
+
+  echo_test:
+    cmd: "echo 'Test message'"
+    numprocs: 1
+    autostart: false
+
+  failing_app:
+    cmd: "exit 1"
+    numprocs: 1
+    autostart: false

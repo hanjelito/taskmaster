@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	var configFile = flag.String("config", "configs/taskmaster.yml", "Path to configuration file")
+	var configFile = flag.String("config", "configs/example.yml", "Path to configuration file")
 	flag.Parse()
 
 	// Initialize logger
@@ -22,6 +22,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to initialize logger: %v", err)
 	}
+	defer appLogger.Close()
 
 	// Load configuration
 	cfg, err := config.Load(*configFile)
@@ -41,8 +42,8 @@ func main() {
 	go handleSignals(processManager, appLogger, *configFile)
 
 	// Start interactive shell
-	shell := shell.New(processManager, appLogger)
-	shell.Run()
+	shellInstance := shell.New(processManager, appLogger) // ← Cambio aquí
+	shellInstance.Run()
 }
 
 func handleSignals(pm *process.Manager, logger *logger.Logger, configFile string) {

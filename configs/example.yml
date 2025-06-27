@@ -1,0 +1,41 @@
+programs:
+  test_echo:
+    cmd: "echo 'Hello from taskmaster process'"
+    numprocs: 1
+    autostart: true
+    autorestart: never
+    exitcodes: [0]
+    starttime: 1
+    startretries: 3
+    stopsignal: TERM
+    stoptime: 5
+    stdout: /tmp/test_echo.stdout
+    stderr: /tmp/test_echo.stderr
+    env:
+      TEST_VAR: "hello_world"
+    workingdir: /tmp
+    umask: 022
+
+  long_running:
+    cmd: "sleep 30"
+    numprocs: 2
+    autostart: true
+    autorestart: always
+    exitcodes: [0]
+    starttime: 2
+    startretries: 3
+    stopsignal: TERM
+    stoptime: 3
+    stdout: /tmp/long_running.stdout
+    stderr: /tmp/long_running.stderr
+
+  failing_process:
+    cmd: "sh -c 'echo failing && exit 1'"
+    numprocs: 1
+    autostart: false
+    autorestart: unexpected
+    exitcodes: [0]
+    starttime: 1
+    startretries: 2
+    stopsignal: TERM
+    stoptime: 2
