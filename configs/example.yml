@@ -24,7 +24,7 @@ programs:
     numprocs: 1
     autostart: true
     autorestart: always
-    exitcodes: [0]
+    exitcodes: [0, -1]
     starttime: 2
     startretries: 5
     stopsignal: TERM
