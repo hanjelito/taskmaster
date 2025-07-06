@@ -104,6 +104,19 @@ func (m *Manager) configureProcessAttributes(cmd *exec.Cmd) {
 // stopProcessInstance detiene una instancia específica de proceso
 func (m *Manager) stopProcessInstance(instance *ProcessInstance) bool {
 	if instance.Cmd == nil || instance.Cmd.Process == nil {
+		m.logger.Info("Process %s has no associated process to stop", instance.Name)
+		return false
+	}
+
+	// Verificar si el proceso ya terminó
+	if instance.Cmd.ProcessState != nil {
+		m.logger.Info("Process %s already finished, no need to stop", instance.Name)
+		return false
+	}
+
+	// Verificar si el proceso aún existe enviando señal 0
+	if err := instance.Cmd.Process.Signal(syscall.Signal(0)); err != nil {
+		m.logger.Info("Process %s no longer exists (PID %d)", instance.Name, instance.PID)
 		return false
 	}
 

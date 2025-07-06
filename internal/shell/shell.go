@@ -3,6 +3,7 @@ package shell
 import (
 	"fmt"
 	"strings"
+	"syscall"
 	"taskmaster/internal/logger"
 	"taskmaster/internal/process"
 	"time"
@@ -120,7 +121,7 @@ func (s *Shell) showHelp() {
 func (s *Shell) showStatus() {
 	status := s.manager.GetStatus()
 	if len(status) == 0 {
-		fmt.Println("📋 No programs running")
+		fmt.Println("📋 No programs configured")
 		return
 	}
 
@@ -129,18 +130,40 @@ func (s *Shell) showStatus() {
 
 	for _, instances := range status {
 		for _, instance := range instances {
+			// Verificar si el proceso aún existe para estados RUNNING
+			if instance.State == process.StateRunning && instance.Cmd != nil && instance.Cmd.Process != nil {
+				if err := instance.Cmd.Process.Signal(syscall.Signal(0)); err != nil {
+					// Proceso ya no existe, pero el estado no se actualizó
+					fmt.Printf("%-20s %-12s %-8s %-10s %-8s (STALE)\n",
+						instance.Name,
+						"UNKNOWN",
+						"-",
+						"N/A",
+						fmt.Sprintf("%d", instance.RestartCount))
+					continue
+				}
+			}
+
 			uptime := "N/A"
-			if !instance.StartTime.IsZero() && instance.State.String() == "RUNNING" {
+			pidStr := fmt.Sprintf("%d", instance.PID)
+
+			// Solo mostrar uptime para procesos realmente corriendo
+			if instance.State == process.StateRunning && !instance.StartTime.IsZero() {
 				uptime = fmt.Sprintf("%.0fs", time.Since(instance.StartTime).Seconds())
+			}
+
+			// Para procesos terminados, no mostrar PID
+			if instance.State == process.StateStopped || instance.State == process.StateFailed {
+				pidStr = "-"
 			}
 
 			stateColor := s.getStateColor(instance.State)
 
-			fmt.Printf("%-20s %s%-12s\033[0m %-8d %-10s %-8d\n",
+			fmt.Printf("%-20s %s%-12s\033[0m %-8s %-10s %-8d\n",
 				instance.Name,
 				stateColor,
 				instance.State.String(),
-				instance.PID,
+				pidStr,
 				uptime,
 				instance.RestartCount)
 		}
