@@ -13,6 +13,7 @@ import (
 	"time"
 )
 
+// Manager gestiona múltiples procesos y sus instancias
 type Manager struct {
 	processes map[string][]*ProcessInstance
 	config    *config.Config
@@ -20,6 +21,7 @@ type Manager struct {
 	mutex     sync.RWMutex
 }
 
+// ProcessInstance representa una instancia específica de un proceso
 type ProcessInstance struct {
 	Name         string
 	Config       *ProcessConfig
@@ -33,6 +35,7 @@ type ProcessInstance struct {
 	ManualStop   bool
 }
 
+// ProcessState representa el estado actual de un proceso
 type ProcessState int
 
 const (
@@ -43,23 +46,22 @@ const (
 	StateRestarting
 )
 
+// String convierte ProcessState a string legible
 func (s ProcessState) String() string {
-	switch s {
-	case StateStopped:
-		return "STOPPED"
-	case StateStarting:
-		return "STARTING"
-	case StateRunning:
-		return "RUNNING"
-	case StateFailed:
-		return "FAILED"
-	case StateRestarting:
-		return "RESTARTING"
-	default:
-		return "UNKNOWN"
+	states := map[ProcessState]string{
+		StateStopped:    "STOPPED",
+		StateStarting:   "STARTING",
+		StateRunning:    "RUNNING",
+		StateFailed:     "FAILED",
+		StateRestarting: "RESTARTING",
 	}
+	if state, exists := states[s]; exists {
+		return state
+	}
+	return "UNKNOWN"
 }
 
+// ProcessConfig contiene la configuración de un proceso
 type ProcessConfig struct {
 	Cmd          string
 	NumProcs     int
@@ -77,6 +79,7 @@ type ProcessConfig struct {
 	Umask        string
 }
 
+// NewManager crea un nuevo gestor de procesos
 func NewManager(cfg *config.Config, logger *logger.Logger) *Manager {
 	return &Manager{
 		processes: make(map[string][]*ProcessInstance),
@@ -85,40 +88,152 @@ func NewManager(cfg *config.Config, logger *logger.Logger) *Manager {
 	}
 }
 
+// StartAutoStartProcesses inicia todos los procesos marcados como autostart
 func (m *Manager) StartAutoStartProcesses() error {
+	var errors []string
+
 	for name, program := range m.config.Programs {
 		if program.AutoStart {
 			if err := m.StartProgram(name); err != nil {
 				m.logger.Error("Failed to start program %s: %v", name, err)
-				continue
+				errors = append(errors, fmt.Sprintf("%s: %v", name, err))
 			}
 		}
+	}
+
+	if len(errors) > 0 {
+		return fmt.Errorf("failed to start some programs: %v", errors)
 	}
 	return nil
 }
 
-// REEMPLAZAR el método StartProgram existente con esta versión:
-
+// StartProgram inicia un programa específico
 func (m *Manager) StartProgram(name string) error {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
+	return m.startProgramUnsafe(name)
+}
+
+// StopProgram detiene un programa específico
+func (m *Manager) StopProgram(name string) error {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
+	return m.stopProgramUnsafe(name)
+}
+
+// GetStatus devuelve el estado actual de todos los procesos
+func (m *Manager) GetStatus() map[string][]*ProcessInstance {
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+
+	return m.copyProcessMap()
+}
+
+// ReloadConfig recarga la configuración y aplica los cambios
+func (m *Manager) ReloadConfig(configFile string) error {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
+	newConfig, err := config.Load(configFile)
+	if err != nil {
+		return fmt.Errorf("failed to load config: %w", err)
+	}
+
+	return m.applyConfigChanges(newConfig)
+}
+
+// CleanupDeadProcesses elimina todas las instancias de procesos muertos
+func (m *Manager) CleanupDeadProcesses() {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
+	cleaned := 0
+	for name := range m.processes {
+		cleaned += m.cleanupProgramUnsafe(name)
+	}
+
+	if cleaned > 0 {
+		m.logger.Info("Cleaned up %d dead process instances", cleaned)
+	}
+}
+
+// CleanupProgram limpia las instancias muertas de un programa específico
+func (m *Manager) CleanupProgram(name string) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
+	if cleaned := m.cleanupProgramUnsafe(name); cleaned > 0 {
+		m.logger.Info("Cleaned up %d dead instances for program %s", cleaned, name)
+	}
+}
+
+// HasActiveProcesses verifica si un programa tiene procesos activos
+func (m *Manager) HasActiveProcesses(programName string) (bool, int) {
+	instances, exists := m.processes[programName]
+	if !exists {
+		return false, 0
+	}
+
+	activeCount := m.countActiveInstances(instances)
+	return activeCount > 0, activeCount
+}
+
+// AutoCleanupProgram limpia automáticamente procesos muertos de un programa específico
+func (m *Manager) AutoCleanupProgram(programName string) {
+	if cleaned := m.cleanupProgramUnsafe(programName); cleaned > 0 {
+		m.logger.Info("Auto-cleaned %d dead instances for program %s", cleaned, programName)
+	}
+}
+
+// ===== MÉTODOS PRIVADOS =====
+
+// startProgramUnsafe inicia un programa sin bloquear (asume que ya se tiene el lock)
+func (m *Manager) startProgramUnsafe(name string) error {
 	program, exists := m.config.Programs[name]
 	if !exists {
 		return fmt.Errorf("program %s not found in configuration", name)
 	}
 
-	// Verificar si hay procesos activos usando el método auxiliar
-	hasActive, activeCount := m.HasActiveProcesses(name)
-	if hasActive {
+	// Verificar procesos activos y limpiar si es necesario
+	if hasActive, activeCount := m.HasActiveProcesses(name); hasActive {
 		return fmt.Errorf("program %s has %d active processes running", name, activeCount)
 	}
 
-	// Limpiar automáticamente procesos muertos
 	m.AutoCleanupProgram(name)
 
 	// Crear configuración de proceso
-	processConfig := &ProcessConfig{
+	processConfig := m.createProcessConfig(program)
+
+	// Crear e iniciar procesos
+	return m.createAndStartInstances(name, program.NumProcs, processConfig)
+}
+
+// stopProgramUnsafe detiene un programa sin bloquear (asume que ya se tiene el lock)
+func (m *Manager) stopProgramUnsafe(name string) error {
+	instances, exists := m.processes[name]
+	if !exists {
+		return fmt.Errorf("program %s is not running", name)
+	}
+
+	stoppedCount := 0
+	for _, instance := range instances {
+		if m.stopProcessInstance(instance) {
+			stoppedCount++
+		}
+	}
+
+	if stoppedCount > 0 {
+		m.logger.Info("Successfully stopped %d process(es) for program %s", stoppedCount, name)
+	}
+
+	return nil
+}
+
+// createProcessConfig crea una configuración de proceso a partir de un programa
+func (m *Manager) createProcessConfig(program config.Program) *ProcessConfig {
+	return &ProcessConfig{
 		Cmd:          program.Cmd,
 		NumProcs:     program.NumProcs,
 		AutoStart:    program.AutoStart,
@@ -134,9 +249,13 @@ func (m *Manager) StartProgram(name string) error {
 		WorkingDir:   program.WorkingDir,
 		Umask:        program.Umask,
 	}
+}
 
-	// Crear e iniciar procesos
-	for i := 0; i < program.NumProcs; i++ {
+// createAndStartInstances crea e inicia múltiples instancias de un proceso
+func (m *Manager) createAndStartInstances(name string, numProcs int, processConfig *ProcessConfig) error {
+	var errors []string
+
+	for i := 0; i < numProcs; i++ {
 		instance := &ProcessInstance{
 			Name:      fmt.Sprintf("%s_%d", name, i),
 			Config:    processConfig,
@@ -148,6 +267,7 @@ func (m *Manager) StartProgram(name string) error {
 		if err := m.startProcessInstance(instance, name); err != nil {
 			m.logger.Error("Failed to start process %s: %v", instance.Name, err)
 			instance.State = StateFailed
+			errors = append(errors, fmt.Sprintf("%s: %v", instance.Name, err))
 			continue
 		}
 
@@ -155,141 +275,180 @@ func (m *Manager) StartProgram(name string) error {
 		m.logger.Info("Started process %s (PID: %d)", instance.Name, instance.PID)
 	}
 
+	if len(errors) > 0 {
+		return fmt.Errorf("failed to start some instances: %v", errors)
+	}
 	return nil
 }
 
+// startProcessInstance inicia una instancia específica de proceso
 func (m *Manager) startProcessInstance(instance *ProcessInstance, programName string) error {
-	// ✅ RESETEAR la bandera de parada manual al iniciar
 	instance.ManualStop = false
-	// Crear comando con umask si se especifica
-	var cmd *exec.Cmd
 
-	if instance.Config.Umask != "" {
-		// Validar formato de umask
-		if _, err := strconv.ParseUint(instance.Config.Umask, 8, 32); err != nil {
-			m.logger.Error("Invalid umask format for %s: %s", instance.Name, instance.Config.Umask)
-			// Crear comando sin umask
-			cmd = exec.Command("sh", "-c", instance.Config.Cmd)
-		} else {
-			// Crear comando con umask usando shell wrapper
-			wrappedCmd := fmt.Sprintf("umask %s; exec %s", instance.Config.Umask, instance.Config.Cmd)
-			cmd = exec.Command("sh", "-c", wrappedCmd)
-		}
-	} else {
-		// Crear comando normal
-		cmd = exec.Command("sh", "-c", instance.Config.Cmd)
+	cmd, err := m.createCommand(instance)
+	if err != nil {
+		return fmt.Errorf("failed to create command: %w", err)
 	}
 
-	// Configurar entorno
-	if len(instance.Config.Env) > 0 {
-		env := os.Environ()
-		for key, value := range instance.Config.Env {
-			env = append(env, fmt.Sprintf("%s=%s", key, value))
-		}
-		cmd.Env = env
-	}
+	m.configureCommand(cmd, instance)
 
-	// Configurar directorio de trabajo
-	if instance.Config.WorkingDir != "" {
-		cmd.Dir = instance.Config.WorkingDir
-	}
-
-	// Configurar redirección de stdout/stderr
-	if instance.Config.Stdout != "" {
-		if instance.Config.Stdout != "/dev/null" {
-			if file, err := os.OpenFile(instance.Config.Stdout, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666); err == nil {
-				cmd.Stdout = file
-			}
-		}
-	}
-
-	if instance.Config.Stderr != "" {
-		if instance.Config.Stderr != "/dev/null" {
-			if file, err := os.OpenFile(instance.Config.Stderr, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666); err == nil {
-				cmd.Stderr = file
-			}
-		}
-	}
-
-	// Configurar atributos del proceso
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Setpgid: true, // Crear nuevo grupo de procesos para mejor control
-	}
-
-	// Iniciar proceso
 	if err := cmd.Start(); err != nil {
-		return err
+		return fmt.Errorf("failed to start command: %w", err)
 	}
 
-	// Configurar instancia
 	instance.Cmd = cmd
 	instance.PID = cmd.Process.Pid
 	instance.State = StateRunning
 
-	// Monitorear proceso en goroutine
 	go m.monitorProcess(instance, programName)
 
 	return nil
 }
 
+// createCommand crea el comando a ejecutar
+func (m *Manager) createCommand(instance *ProcessInstance) (*exec.Cmd, error) {
+	if instance.Config.Umask != "" {
+		if err := m.validateUmask(instance.Config.Umask); err != nil {
+			m.logger.Error("Invalid umask format for %s: %s", instance.Name, instance.Config.Umask)
+			return exec.Command("sh", "-c", instance.Config.Cmd), nil
+		}
+		wrappedCmd := fmt.Sprintf("umask %s; exec %s", instance.Config.Umask, instance.Config.Cmd)
+		return exec.Command("sh", "-c", wrappedCmd), nil
+	}
+
+	return exec.Command("sh", "-c", instance.Config.Cmd), nil
+}
+
+// validateUmask valida el formato del umask
+func (m *Manager) validateUmask(umask string) error {
+	_, err := strconv.ParseUint(umask, 8, 32)
+	return err
+}
+
+// configureCommand configura el comando con ambiente, directorio y redirecciones
+func (m *Manager) configureCommand(cmd *exec.Cmd, instance *ProcessInstance) {
+	m.configureEnvironment(cmd, instance.Config.Env)
+	m.configureWorkingDir(cmd, instance.Config.WorkingDir)
+	m.configureRedirections(cmd, instance.Config.Stdout, instance.Config.Stderr)
+	m.configureProcessAttributes(cmd)
+}
+
+// configureEnvironment configura las variables de ambiente
+func (m *Manager) configureEnvironment(cmd *exec.Cmd, env map[string]string) {
+	if len(env) > 0 {
+		cmd.Env = os.Environ()
+		for key, value := range env {
+			cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", key, value))
+		}
+	}
+}
+
+// configureWorkingDir configura el directorio de trabajo
+func (m *Manager) configureWorkingDir(cmd *exec.Cmd, workingDir string) {
+	if workingDir != "" {
+		cmd.Dir = workingDir
+	}
+}
+
+// configureRedirections configura las redirecciones de stdout y stderr
+func (m *Manager) configureRedirections(cmd *exec.Cmd, stdout, stderr string) {
+	if stdout != "" && stdout != "/dev/null" {
+		if file, err := os.OpenFile(stdout, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666); err == nil {
+			cmd.Stdout = file
+		}
+	}
+
+	if stderr != "" && stderr != "/dev/null" {
+		if file, err := os.OpenFile(stderr, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666); err == nil {
+			cmd.Stderr = file
+		}
+	}
+}
+
+// configureProcessAttributes configura los atributos del proceso
+func (m *Manager) configureProcessAttributes(cmd *exec.Cmd) {
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Setpgid: true,
+	}
+}
+
+// monitorProcess monitorea un proceso en ejecución
 func (m *Manager) monitorProcess(instance *ProcessInstance, programName string) {
-	// Esperar tiempo de inicio para confirmar que el proceso se inició correctamente
 	time.Sleep(time.Duration(instance.Config.StartTime) * time.Second)
 
-	// Verificar si el proceso aún está en ejecución
 	if instance.Cmd.ProcessState == nil {
 		instance.State = StateRunning
 		m.logger.Info("Process %s successfully started and running", instance.Name)
 	}
 
-	// Esperar a que el proceso termine
 	err := instance.Cmd.Wait()
-	exitCode := 0
+	exitCode := m.getExitCode(err)
+	instance.ExitCode = exitCode
 
+	if instance.ManualStop {
+		m.logger.Info("Process %s stopped gracefully", instance.Name)
+		instance.State = StateStopped
+		return
+	}
+
+	m.handleProcessExit(instance, programName, exitCode, err)
+}
+
+// getExitCode extrae el código de salida de un error
+func (m *Manager) getExitCode(err error) int {
+	if err == nil {
+		return 0
+	}
+
+	if exitError, ok := err.(*exec.ExitError); ok {
+		return exitError.ExitCode()
+	}
+
+	return 1
+}
+
+// handleProcessExit maneja la salida de un proceso
+func (m *Manager) handleProcessExit(instance *ProcessInstance, programName string, exitCode int, err error) {
 	if err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok {
-			exitCode = exitError.ExitCode()
-		}
-		instance.ExitCode = exitCode
 		m.logger.Error("Process %s exited with code %d", instance.Name, exitCode)
 	} else {
 		m.logger.Info("Process %s exited normally", instance.Name)
 	}
 
-	// ✅ NUEVA LÓGICA: Si fue parada manual, no reiniciar
-	if instance.ManualStop {
-		m.logger.Info("Process %s was manually stopped, not restarting", instance.Name)
-		instance.State = StateStopped
-		return
-	}
-
-	// Determinar si se debe reiniciar (solo si NO fue parada manual)
-	shouldRestart := m.shouldRestart(instance, exitCode)
-
-	if shouldRestart && instance.RestartCount < instance.Config.StartRetries {
-		m.logger.Info("Restarting process %s (attempt %d/%d)",
-			instance.Name, instance.RestartCount+1, instance.Config.StartRetries)
-
-		instance.State = StateRestarting
-		instance.RestartCount++
-
-		// Pequeña pausa antes de reiniciar
-		time.Sleep(time.Second)
-
-		if err := m.startProcessInstance(instance, programName); err != nil {
-			m.logger.Error("Failed to restart process %s: %v", instance.Name, err)
-			instance.State = StateFailed
-		}
+	if m.shouldRestart(instance, exitCode) && instance.RestartCount < instance.Config.StartRetries {
+		m.attemptRestart(instance, programName)
 	} else {
-		if instance.RestartCount >= instance.Config.StartRetries {
-			m.logger.Error("Process %s failed too many times, giving up", instance.Name)
-			instance.State = StateFailed
-		} else {
-			instance.State = StateStopped
-		}
+		m.finalizeProcess(instance)
 	}
 }
 
+// attemptRestart intenta reiniciar un proceso
+func (m *Manager) attemptRestart(instance *ProcessInstance, programName string) {
+	m.logger.Info("Restarting process %s (attempt %d/%d)",
+		instance.Name, instance.RestartCount+1, instance.Config.StartRetries)
+
+	instance.State = StateRestarting
+	instance.RestartCount++
+
+	time.Sleep(time.Second)
+
+	if err := m.startProcessInstance(instance, programName); err != nil {
+		m.logger.Error("Failed to restart process %s: %v", instance.Name, err)
+		instance.State = StateFailed
+	}
+}
+
+// finalizeProcess finaliza un proceso que no se puede reiniciar
+func (m *Manager) finalizeProcess(instance *ProcessInstance) {
+	if instance.RestartCount >= instance.Config.StartRetries {
+		m.logger.Error("Process %s failed too many times, giving up", instance.Name)
+		instance.State = StateFailed
+	} else {
+		instance.State = StateStopped
+	}
+}
+
+// shouldRestart determina si un proceso debe reiniciarse
 func (m *Manager) shouldRestart(instance *ProcessInstance, exitCode int) bool {
 	switch instance.Config.AutoRestart {
 	case "always":
@@ -297,121 +456,67 @@ func (m *Manager) shouldRestart(instance *ProcessInstance, exitCode int) bool {
 	case "never":
 		return false
 	case "unexpected":
-		// Verificar si el código de salida es esperado
-		for _, expected := range instance.Config.ExitCodes {
-			if exitCode == expected {
-				return false // Salida esperada, no reiniciar
-			}
-		}
-		return true // Salida inesperada, reiniciar
+		return !m.isExpectedExitCode(exitCode, instance.Config.ExitCodes)
 	default:
 		return false
 	}
 }
 
-func (m *Manager) StopProgram(name string) error {
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
-
-	instances, exists := m.processes[name]
-	if !exists {
-		return fmt.Errorf("program %s is not running", name)
-	}
-
-	for _, instance := range instances {
-		if instance.Cmd != nil && instance.Cmd.Process != nil {
-			// ✅ MARCAR COMO PARADA MANUAL
-			instance.ManualStop = true
-
-			// Señalar al proceso que se detenga
-			select {
-			case instance.StopChan <- true:
-			default:
-			}
-
-			// Usar señal configurable y timeout
-			stopTimeout := time.Duration(instance.Config.StopTime) * time.Second
-
-			m.logger.Info("Stopping process %s with signal %s (timeout: %ds)",
-				instance.Name, instance.Config.StopSignal, instance.Config.StopTime)
-
-			if err := signals.GracefulStop(instance.Cmd.Process, instance.Config.StopSignal, stopTimeout); err != nil {
-				m.logger.Error("Failed to stop process %s gracefully: %v", instance.Name, err)
-			} else {
-				m.logger.Info("Process %s stopped gracefully", instance.Name)
-			}
+// isExpectedExitCode verifica si un código de salida es esperado
+func (m *Manager) isExpectedExitCode(exitCode int, expectedCodes []int) bool {
+	for _, expected := range expectedCodes {
+		if exitCode == expected {
+			return true
 		}
-
-		instance.State = StateStopped
 	}
-
-	// ✅ NO eliminar del mapa, mantener como STOPPED
-	// delete(m.processes, name) // REMOVER ESTA LÍNEA
-
-	return nil
+	return false
 }
 
-func (m *Manager) GetStatus() map[string][]*ProcessInstance {
-	m.mutex.RLock()
-	defer m.mutex.RUnlock()
-
-	// Crear copia para evitar modificaciones concurrentes
-	status := make(map[string][]*ProcessInstance)
-	for name, instances := range m.processes {
-		status[name] = make([]*ProcessInstance, len(instances))
-		copy(status[name], instances)
+// stopProcessInstance detiene una instancia específica de proceso
+func (m *Manager) stopProcessInstance(instance *ProcessInstance) bool {
+	if instance.Cmd == nil || instance.Cmd.Process == nil {
+		return false
 	}
-	return status
+
+	instance.ManualStop = true
+
+	select {
+	case instance.StopChan <- true:
+	default:
+	}
+
+	stopTimeout := time.Duration(instance.Config.StopTime) * time.Second
+
+	m.logger.Info("Stopping process %s with signal %s (timeout: %ds)",
+		instance.Name, instance.Config.StopSignal, instance.Config.StopTime)
+
+	if err := signals.GracefulStop(instance.Cmd.Process, instance.Config.StopSignal, stopTimeout); err != nil {
+		m.logger.Error("Failed to stop process %s gracefully: %v", instance.Name, err)
+		return false
+	}
+
+	instance.State = StateStopped
+	return true
 }
 
-func (m *Manager) ReloadConfig(configFile string) error {
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
-
-	// Cargar nueva configuración
-	newConfig, err := config.Load(configFile)
-	if err != nil {
-		return err
-	}
-
+// applyConfigChanges aplica los cambios de configuración
+func (m *Manager) applyConfigChanges(newConfig *config.Config) error {
 	oldPrograms := make(map[string]config.Program)
 	for name, program := range m.config.Programs {
 		oldPrograms[name] = program
 	}
 
-	// Actualizar configuración
 	m.config = newConfig
 
-	// Procesar cambios
+	// Procesar programas nuevos y modificados
 	for name, newProgram := range newConfig.Programs {
-		oldProgram, existed := oldPrograms[name]
-
-		if !existed {
-			// Programa nuevo, iniciarlo si autostart está habilitado
-			if newProgram.AutoStart {
-				m.logger.Info("Starting new program %s", name)
-				if err := m.startProgramUnsafe(name); err != nil {
-					m.logger.Error("Failed to start new program %s: %v", name, err)
-				}
-			}
-		} else {
-			// Programa existente, verificar si cambió
-			if !m.programsEqual(oldProgram, newProgram) {
-				m.logger.Info("Program %s configuration changed, restarting", name)
-				if err := m.stopProgramUnsafe(name); err != nil {
-					m.logger.Error("Failed to stop program %s for restart: %v", name, err)
-				}
-				if newProgram.AutoStart {
-					if err := m.startProgramUnsafe(name); err != nil {
-						m.logger.Error("Failed to restart program %s: %v", name, err)
-					}
-				}
-			}
+		if err := m.handleProgramChange(name, newProgram, oldPrograms); err != nil {
+			m.logger.Error("Failed to handle program change %s: %v", name, err)
 		}
 		delete(oldPrograms, name)
 	}
 
-	// Detener programas que ya no están en la configuración
+	// Detener programas eliminados
 	for name := range oldPrograms {
 		m.logger.Info("Removing program %s (no longer in configuration)", name)
 		if err := m.stopProgramUnsafe(name); err != nil {
@@ -423,89 +528,44 @@ func (m *Manager) ReloadConfig(configFile string) error {
 	return nil
 }
 
-func (m *Manager) startProgramUnsafe(name string) error {
-	// Versión interna sin lock (ya tenemos el lock)
-	program, exists := m.config.Programs[name]
-	if !exists {
-		return fmt.Errorf("program %s not found in configuration", name)
+// handleProgramChange maneja los cambios en un programa específico
+func (m *Manager) handleProgramChange(name string, newProgram config.Program, oldPrograms map[string]config.Program) error {
+	oldProgram, existed := oldPrograms[name]
+
+	if !existed {
+		return m.handleNewProgram(name, newProgram)
 	}
 
-	// Limpiar slice anterior
-	m.processes[name] = nil
+	return m.handleModifiedProgram(name, oldProgram, newProgram)
+}
 
-	// Crear configuración de proceso
-	processConfig := &ProcessConfig{
-		Cmd:          program.Cmd,
-		NumProcs:     program.NumProcs,
-		AutoStart:    program.AutoStart,
-		AutoRestart:  program.AutoRestart,
-		ExitCodes:    program.ExitCodes,
-		StartTime:    program.StartTime,
-		StartRetries: program.StartRetries,
-		StopSignal:   program.StopSignal,
-		StopTime:     program.StopTime,
-		Stdout:       program.Stdout,
-		Stderr:       program.Stderr,
-		Env:          program.Env,
-		WorkingDir:   program.WorkingDir,
-		Umask:        program.Umask,
+// handleNewProgram maneja un programa nuevo
+func (m *Manager) handleNewProgram(name string, program config.Program) error {
+	if program.AutoStart {
+		m.logger.Info("Starting new program %s", name)
+		return m.startProgramUnsafe(name)
 	}
-
-	// Crear e iniciar procesos
-	for i := 0; i < program.NumProcs; i++ {
-		instance := &ProcessInstance{
-			Name:      fmt.Sprintf("%s_%d", name, i),
-			Config:    processConfig,
-			State:     StateStarting,
-			StartTime: time.Now(),
-			StopChan:  make(chan bool, 1),
-		}
-
-		if err := m.startProcessInstance(instance, name); err != nil {
-			m.logger.Error("Failed to start process %s: %v", instance.Name, err)
-			instance.State = StateFailed
-			continue
-		}
-
-		m.processes[name] = append(m.processes[name], instance)
-		m.logger.Info("Started process %s (PID: %d)", instance.Name, instance.PID)
-	}
-
 	return nil
 }
 
-func (m *Manager) stopProgramUnsafe(name string) error {
-	// Versión interna sin lock (ya tenemos el lock)
-	instances, exists := m.processes[name]
-	if !exists {
-		return fmt.Errorf("program %s is not running", name)
-	}
+// handleModifiedProgram maneja un programa modificado
+func (m *Manager) handleModifiedProgram(name string, oldProgram, newProgram config.Program) error {
+	if !m.programsEqual(oldProgram, newProgram) {
+		m.logger.Info("Program %s configuration changed, restarting", name)
 
-	for _, instance := range instances {
-		if instance.Cmd != nil && instance.Cmd.Process != nil {
-			select {
-			case instance.StopChan <- true:
-			default:
-			}
-
-			stopTimeout := time.Duration(instance.Config.StopTime) * time.Second
-
-			if err := signals.GracefulStop(instance.Cmd.Process, instance.Config.StopSignal, stopTimeout); err != nil {
-				m.logger.Error("Failed to stop process %s gracefully: %v", instance.Name, err)
-			} else {
-				m.logger.Info("Process %s stopped gracefully", instance.Name)
-			}
+		if err := m.stopProgramUnsafe(name); err != nil {
+			return fmt.Errorf("failed to stop program for restart: %w", err)
 		}
 
-		instance.State = StateStopped
+		if newProgram.AutoStart {
+			return m.startProgramUnsafe(name)
+		}
 	}
-
-	delete(m.processes, name)
 	return nil
 }
 
+// programsEqual compara dos configuraciones de programa
 func (m *Manager) programsEqual(old, new config.Program) bool {
-	// Comparar campos importantes que requieren reinicio
 	return old.Cmd == new.Cmd &&
 		old.NumProcs == new.NumProcs &&
 		old.AutoRestart == new.AutoRestart &&
@@ -521,6 +581,7 @@ func (m *Manager) programsEqual(old, new config.Program) bool {
 		m.mapsEqual(old.Env, new.Env)
 }
 
+// slicesEqual compara dos slices de enteros
 func (m *Manager) slicesEqual(a, b []int) bool {
 	if len(a) != len(b) {
 		return false
@@ -533,6 +594,7 @@ func (m *Manager) slicesEqual(a, b []int) bool {
 	return true
 }
 
+// mapsEqual compara dos mapas string-string
 func (m *Manager) mapsEqual(a, b map[string]string) bool {
 	if len(a) != len(b) {
 		return false
@@ -545,92 +607,18 @@ func (m *Manager) mapsEqual(a, b map[string]string) bool {
 	return true
 }
 
-func (m *Manager) CleanupDeadProcesses() {
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
-
-	cleaned := 0
-	for name, instances := range m.processes {
-		activeInstances := []*ProcessInstance{}
-		for _, instance := range instances {
-			if instance.State == StateRunning || instance.State == StateStarting || instance.State == StateRestarting {
-				activeInstances = append(activeInstances, instance)
-			} else {
-				cleaned++
-			}
-		}
-
-		if len(activeInstances) == 0 {
-			// Si no hay instancias activas, remover completamente del mapa
-			delete(m.processes, name)
-		} else {
-			// Actualizar con solo las instancias activas
-			m.processes[name] = activeInstances
-		}
-	}
-
-	if cleaned > 0 {
-		m.logger.Info("Cleaned up %d dead process instances", cleaned)
-	}
-}
-
-func (m *Manager) CleanupProgram(name string) {
-	m.mutex.Lock()
-	defer m.mutex.Unlock()
-
-	if instances, exists := m.processes[name]; exists {
-		activeInstances := []*ProcessInstance{}
-		cleaned := 0
-
-		for _, instance := range instances {
-			if instance.State == StateRunning || instance.State == StateStarting || instance.State == StateRestarting {
-				activeInstances = append(activeInstances, instance)
-			} else {
-				cleaned++
-			}
-		}
-
-		if len(activeInstances) == 0 {
-			delete(m.processes, name)
-		} else {
-			m.processes[name] = activeInstances
-		}
-
-		if cleaned > 0 {
-			m.logger.Info("Cleaned up %d dead instances for program %s", cleaned, name)
-		}
-	}
-}
-
-// HasActiveProcesses verifica si un programa tiene procesos activos
-func (m *Manager) HasActiveProcesses(programName string) (bool, int) {
-	instances, exists := m.processes[programName]
+// cleanupProgramUnsafe limpia las instancias muertas de un programa
+func (m *Manager) cleanupProgramUnsafe(name string) int {
+	instances, exists := m.processes[name]
 	if !exists {
-		return false, 0
-	}
-
-	activeCount := 0
-	for _, instance := range instances {
-		if instance.State == StateRunning || instance.State == StateStarting || instance.State == StateRestarting {
-			activeCount++
-		}
-	}
-
-	return activeCount > 0, activeCount
-}
-
-// AutoCleanupProgram limpia automáticamente procesos muertos de un programa específico
-func (m *Manager) AutoCleanupProgram(programName string) {
-	instances, exists := m.processes[programName]
-	if !exists {
-		return
+		return 0
 	}
 
 	activeInstances := []*ProcessInstance{}
 	cleanedCount := 0
 
 	for _, instance := range instances {
-		if instance.State == StateRunning || instance.State == StateStarting || instance.State == StateRestarting {
+		if m.isActiveInstance(instance) {
 			activeInstances = append(activeInstances, instance)
 		} else {
 			cleanedCount++
@@ -639,10 +627,39 @@ func (m *Manager) AutoCleanupProgram(programName string) {
 
 	if cleanedCount > 0 {
 		if len(activeInstances) == 0 {
-			delete(m.processes, programName)
+			delete(m.processes, name)
 		} else {
-			m.processes[programName] = activeInstances
+			m.processes[name] = activeInstances
 		}
-		m.logger.Info("Auto-cleaned %d dead instances for program %s", cleanedCount, programName)
 	}
+
+	return cleanedCount
+}
+
+// isActiveInstance verifica si una instancia está activa
+func (m *Manager) isActiveInstance(instance *ProcessInstance) bool {
+	return instance.State == StateRunning ||
+		instance.State == StateStarting ||
+		instance.State == StateRestarting
+}
+
+// countActiveInstances cuenta las instancias activas en una lista
+func (m *Manager) countActiveInstances(instances []*ProcessInstance) int {
+	count := 0
+	for _, instance := range instances {
+		if m.isActiveInstance(instance) {
+			count++
+		}
+	}
+	return count
+}
+
+// copyProcessMap crea una copia profunda del mapa de procesos
+func (m *Manager) copyProcessMap() map[string][]*ProcessInstance {
+	status := make(map[string][]*ProcessInstance)
+	for name, instances := range m.processes {
+		status[name] = make([]*ProcessInstance, len(instances))
+		copy(status[name], instances)
+	}
+	return status
 }

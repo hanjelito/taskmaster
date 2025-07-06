@@ -1,127 +1,93 @@
-[2025-07-01 12:52:58] INFO: 🚀 Starting Taskmaster...
-[2025-07-01 12:52:58] INFO: ✅ Configuration loaded from configs/example.yml
-[2025-07-01 12:52:58] INFO: Started process worker_pool_0 (PID: 33369)
-[2025-07-01 12:52:58] INFO: Started process worker_pool_1 (PID: 33370)
-[2025-07-01 12:52:58] INFO: Started process worker_pool_2 (PID: 33371)
-[2025-07-01 12:52:58] INFO: Started process worker_pool_3 (PID: 33372)
-[2025-07-01 12:52:58] INFO: Started process test_program_0 (PID: 33373)
-[2025-07-01 12:52:58] INFO: Started process test_program_1 (PID: 33374)
-[2025-07-01 12:52:58] INFO: Started process logger_program_0 (PID: 33375)
-[2025-07-01 12:52:58] INFO: 🎮 Starting interactive shell...
-[2025-07-01 12:53:00] INFO: Process worker_pool_0 successfully started and running
-[2025-07-01 12:53:00] INFO: Process worker_pool_1 successfully started and running
-[2025-07-01 12:53:00] INFO: Process worker_pool_2 successfully started and running
-[2025-07-01 12:53:00] INFO: Process worker_pool_3 successfully started and running
-[2025-07-01 12:53:00] INFO: Process logger_program_0 successfully started and running
-[2025-07-01 12:53:01] INFO: Process test_program_0 successfully started and running
-[2025-07-01 12:53:01] INFO: Process test_program_1 successfully started and running
-[2025-07-01 12:53:14] INFO: Process worker_pool_3 exited normally
-[2025-07-01 12:53:15] INFO: Process worker_pool_0 exited normally
-[2025-07-01 12:53:24] INFO: Process worker_pool_2 exited normally
-[2025-07-01 12:53:26] INFO: Process worker_pool_1 exited normally
-[2025-07-01 12:53:58] INFO: Process test_program_0 exited normally
-[2025-07-01 12:53:58] INFO: Process test_program_1 exited normally
-[2025-07-01 12:54:01] INFO: 📡 Received shutdown signal, stopping all processes...
-[2025-07-01 12:54:14] INFO: 🚀 Starting Taskmaster...
-[2025-07-01 12:54:14] INFO: ✅ Configuration loaded from configs/example.yml
-[2025-07-01 12:54:14] INFO: Started process test_program_0 (PID: 33720)
-[2025-07-01 12:54:14] INFO: Started process test_program_1 (PID: 33721)
-[2025-07-01 12:54:14] INFO: Started process logger_program_0 (PID: 33722)
-[2025-07-01 12:54:14] INFO: Started process worker_pool_0 (PID: 33723)
-[2025-07-01 12:54:14] INFO: Started process worker_pool_1 (PID: 33724)
-[2025-07-01 12:54:14] INFO: Started process worker_pool_2 (PID: 33725)
-[2025-07-01 12:54:14] INFO: Started process worker_pool_3 (PID: 33726)
-[2025-07-01 12:54:14] INFO: 🎮 Starting interactive shell...
-[2025-07-01 12:54:16] INFO: Process logger_program_0 successfully started and running
-[2025-07-01 12:54:16] INFO: Process worker_pool_0 successfully started and running
-[2025-07-01 12:54:16] INFO: Process worker_pool_1 successfully started and running
-[2025-07-01 12:54:16] INFO: Process worker_pool_2 successfully started and running
-[2025-07-01 12:54:16] INFO: Process worker_pool_3 successfully started and running
-[2025-07-01 12:54:17] INFO: Process test_program_0 successfully started and running
-[2025-07-01 12:54:17] INFO: Process test_program_1 successfully started and running
-[2025-07-01 12:54:24] INFO: Process worker_pool_2 exited normally
-[2025-07-01 12:54:25] INFO: Process worker_pool_1 exited normally
-[2025-07-01 12:54:34] INFO: Process worker_pool_3 exited normally
-[2025-07-01 12:54:35] INFO: Process worker_pool_0 exited normally
-[2025-07-01 12:54:44] INFO: Process test_program_0 exited normally
-[2025-07-01 12:54:44] INFO: Process test_program_1 exited normally
-[2025-07-01 12:59:27] ERROR: Process logger_program_0 exited with code -1
-[2025-07-01 12:59:27] INFO: Restarting process logger_program_0 (attempt 1/5)
-[2025-07-01 12:59:30] INFO: Process logger_program_0 successfully started and running
-[2025-07-01 13:00:08] ERROR: Process logger_program_0 exited with code -1
-[2025-07-01 13:00:08] INFO: Restarting process logger_program_0 (attempt 2/5)
-[2025-07-01 13:00:11] INFO: Process logger_program_0 successfully started and running
-[2025-07-01 13:00:32] ERROR: Process logger_program_0 exited with code -1
-[2025-07-01 13:00:32] INFO: Restarting process logger_program_0 (attempt 3/5)
-[2025-07-01 13:00:35] INFO: Process logger_program_0 successfully started and running
-[2025-07-01 13:01:10] ERROR: Process logger_program_0 exited with code -1
-[2025-07-01 13:01:10] INFO: Restarting process logger_program_0 (attempt 4/5)
-[2025-07-01 13:01:13] INFO: Process logger_program_0 successfully started and running
-[2025-07-01 13:01:23] ERROR: Process logger_program_0 exited with code -1
-[2025-07-01 13:01:23] INFO: Restarting process logger_program_0 (attempt 5/5)
-[2025-07-01 13:01:26] INFO: Process logger_program_0 successfully started and running
-[2025-07-01 13:01:39] ERROR: Process logger_program_0 exited with code -1
-[2025-07-01 13:01:39] ERROR: Process logger_program_0 failed too many times, giving up
-[2025-07-01 13:21:08] INFO: 🛑 Shutting down Taskmaster...
-[2025-07-01 13:21:08] INFO: Stopping process worker_pool_0 with signal TERM (timeout: 10s)
-[2025-07-01 13:21:08] ERROR: Failed to stop process worker_pool_0 gracefully: failed to send TERM: os: process already finished
-[2025-07-01 13:21:08] INFO: Stopping process worker_pool_1 with signal TERM (timeout: 10s)
-[2025-07-01 13:21:08] ERROR: Failed to stop process worker_pool_1 gracefully: failed to send TERM: os: process already finished
-[2025-07-01 13:21:08] INFO: Stopping process worker_pool_2 with signal TERM (timeout: 10s)
-[2025-07-01 13:21:08] ERROR: Failed to stop process worker_pool_2 gracefully: failed to send TERM: os: process already finished
-[2025-07-01 13:21:08] INFO: Stopping process worker_pool_3 with signal TERM (timeout: 10s)
-[2025-07-01 13:21:08] ERROR: Failed to stop process worker_pool_3 gracefully: failed to send TERM: os: process already finished
-[2025-07-01 13:21:08] INFO: Stopping process test_program_0 with signal TERM (timeout: 10s)
-[2025-07-01 13:21:08] ERROR: Failed to stop process test_program_0 gracefully: failed to send TERM: os: process already finished
-[2025-07-01 13:21:08] INFO: Stopping process test_program_1 with signal TERM (timeout: 10s)
-[2025-07-01 13:21:08] ERROR: Failed to stop process test_program_1 gracefully: failed to send TERM: os: process already finished
-[2025-07-01 13:21:08] INFO: Stopping process logger_program_0 with signal TERM (timeout: 15s)
-[2025-07-01 13:21:08] ERROR: Failed to stop process logger_program_0 gracefully: failed to send TERM: os: process already finished
-[2025-07-01 13:21:08] INFO: 👋 Taskmaster shutdown complete
-[2025-07-01 14:08:25] INFO: 🚀 Starting Taskmaster...
-[2025-07-01 14:08:25] INFO: ✅ Configuration loaded from configs/example.yml
-[2025-07-01 14:08:25] INFO: Started process worker_pool_0 (PID: 37550)
-[2025-07-01 14:08:25] INFO: Started process worker_pool_1 (PID: 37551)
-[2025-07-01 14:08:25] INFO: Started process worker_pool_2 (PID: 37552)
-[2025-07-01 14:08:25] INFO: Started process worker_pool_3 (PID: 37553)
-[2025-07-01 14:08:25] INFO: Started process test_program_0 (PID: 37554)
-[2025-07-01 14:08:25] INFO: Started process test_program_1 (PID: 37555)
-[2025-07-01 14:08:25] INFO: Started process logger_program_0 (PID: 37556)
-[2025-07-01 14:08:25] INFO: 🎮 Starting interactive shell...
-[2025-07-01 14:08:27] INFO: Process worker_pool_1 successfully started and running
-[2025-07-01 14:08:27] INFO: Process worker_pool_2 successfully started and running
-[2025-07-01 14:08:27] INFO: Process worker_pool_0 successfully started and running
-[2025-07-01 14:08:27] INFO: Process worker_pool_3 successfully started and running
-[2025-07-01 14:08:27] INFO: Process logger_program_0 successfully started and running
-[2025-07-01 14:08:28] INFO: Process test_program_1 successfully started and running
-[2025-07-01 14:08:28] INFO: Process test_program_0 successfully started and running
-[2025-07-01 14:08:37] INFO: 🛑 Shutting down Taskmaster...
-[2025-07-01 14:08:37] INFO: Stopping process test_program_0 with signal TERM (timeout: 10s)
-[2025-07-01 14:08:37] ERROR: Process test_program_0 exited with code -1
-[2025-07-01 14:08:37] INFO: Process test_program_0 was manually stopped, not restarting
-[2025-07-01 14:08:37] INFO: Process test_program_0 stopped gracefully
-[2025-07-01 14:08:37] INFO: Stopping process test_program_1 with signal TERM (timeout: 10s)
-[2025-07-01 14:08:37] ERROR: Process test_program_1 exited with code -1
-[2025-07-01 14:08:37] INFO: Process test_program_1 was manually stopped, not restarting
-[2025-07-01 14:08:38] INFO: Process test_program_1 stopped gracefully
-[2025-07-01 14:08:38] INFO: Stopping process logger_program_0 with signal TERM (timeout: 15s)
-[2025-07-01 14:08:38] ERROR: Process logger_program_0 exited with code -1
-[2025-07-01 14:08:38] INFO: Process logger_program_0 was manually stopped, not restarting
-[2025-07-01 14:08:38] INFO: Process logger_program_0 stopped gracefully
-[2025-07-01 14:08:38] INFO: Stopping process worker_pool_0 with signal TERM (timeout: 10s)
-[2025-07-01 14:08:38] ERROR: Process worker_pool_0 exited with code -1
-[2025-07-01 14:08:38] INFO: Process worker_pool_0 was manually stopped, not restarting
-[2025-07-01 14:08:38] INFO: Process worker_pool_0 stopped gracefully
-[2025-07-01 14:08:38] INFO: Stopping process worker_pool_1 with signal TERM (timeout: 10s)
-[2025-07-01 14:08:38] ERROR: Process worker_pool_1 exited with code -1
-[2025-07-01 14:08:38] INFO: Process worker_pool_1 was manually stopped, not restarting
-[2025-07-01 14:08:38] INFO: Process worker_pool_1 stopped gracefully
-[2025-07-01 14:08:38] INFO: Stopping process worker_pool_2 with signal TERM (timeout: 10s)
-[2025-07-01 14:08:38] ERROR: Process worker_pool_2 exited with code -1
-[2025-07-01 14:08:38] INFO: Process worker_pool_2 was manually stopped, not restarting
-[2025-07-01 14:08:38] INFO: Process worker_pool_2 stopped gracefully
-[2025-07-01 14:08:38] INFO: Stopping process worker_pool_3 with signal TERM (timeout: 10s)
-[2025-07-01 14:08:38] ERROR: Process worker_pool_3 exited with code -1
-[2025-07-01 14:08:38] INFO: Process worker_pool_3 was manually stopped, not restarting
-[2025-07-01 14:08:38] INFO: Process worker_pool_3 stopped gracefully
-[2025-07-01 14:08:38] INFO: 👋 Taskmaster shutdown complete
+[2025-07-06 02:11:49] INFO: 🚀 Starting Taskmaster...
+[2025-07-06 02:11:49] INFO: ✅ Configuration loaded from configs/example.yml
+[2025-07-06 02:11:49] INFO: Started process logger_program_0 (PID: 34776)
+[2025-07-06 02:11:49] INFO: Started process worker_pool_0 (PID: 34777)
+[2025-07-06 02:11:49] INFO: Started process worker_pool_1 (PID: 34778)
+[2025-07-06 02:11:49] INFO: Started process worker_pool_2 (PID: 34779)
+[2025-07-06 02:11:49] INFO: Started process worker_pool_3 (PID: 34780)
+[2025-07-06 02:11:49] INFO: Started process test_program_0 (PID: 34781)
+[2025-07-06 02:11:49] INFO: Started process test_program_1 (PID: 34782)
+[2025-07-06 02:11:49] INFO: 🎮 Starting interactive shell...
+[2025-07-06 02:11:51] INFO: Process logger_program_0 successfully started and running
+[2025-07-06 02:11:51] INFO: Process worker_pool_0 successfully started and running
+[2025-07-06 02:11:51] INFO: Process worker_pool_1 successfully started and running
+[2025-07-06 02:11:51] INFO: Process worker_pool_2 successfully started and running
+[2025-07-06 02:11:51] INFO: Process worker_pool_3 successfully started and running
+[2025-07-06 02:11:52] INFO: Process test_program_0 successfully started and running
+[2025-07-06 02:11:52] INFO: Process test_program_1 successfully started and running
+[2025-07-06 02:12:07] INFO: Process worker_pool_2 exited normally
+[2025-07-06 02:12:08] INFO: Process worker_pool_1 exited normally
+[2025-07-06 02:12:17] INFO: Process worker_pool_3 exited normally
+[2025-07-06 02:12:18] INFO: Process worker_pool_0 exited normally
+[2025-07-06 02:12:19] INFO: Process test_program_0 exited normally
+[2025-07-06 02:12:19] INFO: Process test_program_1 exited normally
+[2025-07-06 02:14:05] INFO: 🛑 Shutting down Taskmaster...
+[2025-07-06 02:14:05] INFO: Stopping process test_program_0 with signal TERM (timeout: 10s)
+[2025-07-06 02:14:05] ERROR: Failed to stop process test_program_0 gracefully: failed to send TERM: os: process already finished
+[2025-07-06 02:14:05] INFO: Stopping process test_program_1 with signal TERM (timeout: 10s)
+[2025-07-06 02:14:05] ERROR: Failed to stop process test_program_1 gracefully: failed to send TERM: os: process already finished
+[2025-07-06 02:14:05] INFO: Stopping process logger_program_0 with signal TERM (timeout: 15s)
+[2025-07-06 02:14:05] INFO: Process logger_program_0 stopped gracefully
+[2025-07-06 02:14:06] INFO: Successfully stopped 1 process(es) for program logger_program
+[2025-07-06 02:14:06] INFO: Stopping process worker_pool_0 with signal TERM (timeout: 10s)
+[2025-07-06 02:14:06] ERROR: Failed to stop process worker_pool_0 gracefully: failed to send TERM: os: process already finished
+[2025-07-06 02:14:06] INFO: Stopping process worker_pool_1 with signal TERM (timeout: 10s)
+[2025-07-06 02:14:06] ERROR: Failed to stop process worker_pool_1 gracefully: failed to send TERM: os: process already finished
+[2025-07-06 02:14:06] INFO: Stopping process worker_pool_2 with signal TERM (timeout: 10s)
+[2025-07-06 02:14:06] ERROR: Failed to stop process worker_pool_2 gracefully: failed to send TERM: os: process already finished
+[2025-07-06 02:14:06] INFO: Stopping process worker_pool_3 with signal TERM (timeout: 10s)
+[2025-07-06 02:14:06] ERROR: Failed to stop process worker_pool_3 gracefully: failed to send TERM: os: process already finished
+[2025-07-06 02:14:06] INFO: 👋 Taskmaster shutdown complete
+[2025-07-06 02:16:45] INFO: 🚀 Starting Taskmaster...
+[2025-07-06 02:16:45] INFO: ✅ Configuration loaded from configs/example.yml
+[2025-07-06 02:16:45] INFO: Started process worker_pool_0 (PID: 35727)
+[2025-07-06 02:16:45] INFO: Started process worker_pool_1 (PID: 35728)
+[2025-07-06 02:16:45] INFO: Started process worker_pool_2 (PID: 35729)
+[2025-07-06 02:16:45] INFO: Started process worker_pool_3 (PID: 35730)
+[2025-07-06 02:16:45] INFO: Started process test_program_0 (PID: 35731)
+[2025-07-06 02:16:45] INFO: Started process test_program_1 (PID: 35732)
+[2025-07-06 02:16:45] INFO: Started process logger_program_0 (PID: 35733)
+[2025-07-06 02:16:45] INFO: 🎮 Starting interactive shell...
+[2025-07-06 02:16:47] INFO: Process worker_pool_0 successfully started and running
+[2025-07-06 02:16:47] INFO: Process worker_pool_1 successfully started and running
+[2025-07-06 02:16:47] INFO: Process worker_pool_2 successfully started and running
+[2025-07-06 02:16:47] INFO: Process worker_pool_3 successfully started and running
+[2025-07-06 02:16:47] INFO: Process logger_program_0 successfully started and running
+[2025-07-06 02:16:48] INFO: Process test_program_0 successfully started and running
+[2025-07-06 02:16:48] INFO: Process test_program_1 successfully started and running
+[2025-07-06 02:16:56] INFO: Process worker_pool_0 exited normally
+[2025-07-06 02:16:57] INFO: Stopping process logger_program_0 with signal TERM (timeout: 15s)
+[2025-07-06 02:16:57] INFO: Process logger_program_0 stopped gracefully
+[2025-07-06 02:16:58] INFO: Successfully stopped 1 process(es) for program logger_program
+[2025-07-06 02:17:03] INFO: Process worker_pool_3 exited normally
+[2025-07-06 02:17:04] INFO: Auto-cleaned 1 dead instances for program logger_program
+[2025-07-06 02:17:04] INFO: Started process logger_program_0 (PID: 35804)
+[2025-07-06 02:17:04] INFO: Process worker_pool_2 exited normally
+[2025-07-06 02:17:06] INFO: Process logger_program_0 successfully started and running
+[2025-07-06 02:17:12] ERROR: Process logger_program_0 exited with code -1
+[2025-07-06 02:17:12] INFO: Restarting process logger_program_0 (attempt 1/5)
+[2025-07-06 02:17:14] INFO: Process worker_pool_1 exited normally
+[2025-07-06 02:17:15] INFO: Process logger_program_0 successfully started and running
+[2025-07-06 02:17:15] INFO: Process test_program_0 exited normally
+[2025-07-06 02:17:15] INFO: Process test_program_1 exited normally
+[2025-07-06 02:17:35] INFO: Stopping process logger_program_0 with signal TERM (timeout: 15s)
+[2025-07-06 02:17:35] INFO: Process logger_program_0 stopped gracefully
+[2025-07-06 02:17:35] INFO: Successfully stopped 1 process(es) for program logger_program
+[2025-07-06 02:17:42] INFO: Configuration reloaded successfully
+[2025-07-06 02:17:52] INFO: Auto-cleaned 1 dead instances for program logger_program
+[2025-07-06 02:17:52] INFO: Started process logger_program_0 (PID: 35949)
+[2025-07-06 02:17:54] INFO: Process logger_program_0 successfully started and running
+[2025-07-06 02:17:54] INFO: Configuration reloaded successfully
+[2025-07-06 02:17:58] INFO: Cleaned up 6 dead process instances
+[2025-07-06 02:18:07] INFO: Started process worker_pool_0 (PID: 36004)
+[2025-07-06 02:18:07] INFO: Started process worker_pool_1 (PID: 36005)
+[2025-07-06 02:18:07] INFO: Started process worker_pool_2 (PID: 36006)
+[2025-07-06 02:18:07] INFO: Started process worker_pool_3 (PID: 36007)
+[2025-07-06 02:18:09] INFO: Process worker_pool_0 successfully started and running
+[2025-07-06 02:18:09] INFO: Process worker_pool_1 successfully started and running
+[2025-07-06 02:18:09] INFO: Process worker_pool_2 successfully started and running
+[2025-07-06 02:18:09] INFO: Process worker_pool_3 successfully started and running
+[2025-07-06 02:18:17] INFO: Process worker_pool_3 exited normally
+[2025-07-06 02:18:18] INFO: Process worker_pool_0 exited normally
+[2025-07-06 02:18:26] INFO: Process worker_pool_2 exited normally
+[2025-07-06 02:18:28] INFO: Process worker_pool_1 exited normally
