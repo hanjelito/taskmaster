@@ -69,6 +69,21 @@ run-config: build
 	@echo "🚀 Running $(BINARY_NAME) with config $(CONFIG)..."
 	./$(BINARY_NAME) -config $(CONFIG)
 
+# Run with web interface
+run-web: build
+	@echo "🚀 Running $(BINARY_NAME) with web interface..."
+	./$(BINARY_NAME) -config $(CONFIG_DIR)/example.yml -web-port 8080
+
+# Run with web interface and custom config
+run-web-config: build
+	@if [ -z "$(CONFIG)" ]; then \
+		echo "❌ Usage: make run-web-config CONFIG=path/to/config.yml [PORT=8080]"; \
+		exit 1; \
+	fi
+	@PORT=$${PORT:-8080}; \
+	echo "🚀 Running $(BINARY_NAME) with web interface on port $$PORT..."; \
+	./$(BINARY_NAME) -config $(CONFIG) -web-port $$PORT
+
 # Create example configuration
 create-config:
 	@echo "📝 Creating example configuration..."
@@ -159,6 +174,8 @@ help:
 	@echo "Run commands:"
 	@echo "  run            - Build and run with default config"
 	@echo "  run-config     - Build and run with custom config (use CONFIG=path)"
+	@echo "  run-web        - Build and run with web interface on port 8080"
+	@echo "  run-web-config - Build and run with web interface and custom config"
 	@echo "  dev            - Development mode (clean build + run)"
 	@echo ""
 	@echo "Configuration:"
@@ -180,5 +197,7 @@ help:
 	@echo "Examples:"
 	@echo "  make build"
 	@echo "  make run"
-	@echo "  make run-config CONFIG=configs/production.yml"
+	@echo "  make run-config CONFIG=configs/example.yml"
+	@echo "  make run-web"
+	@echo "  make run-web-config CONFIG=configs/example.yml PORT=9000"
 	@echo "  make dev"

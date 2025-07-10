@@ -23,8 +23,8 @@ programs:
     cmd: "bash -c 'while true; do echo \"Log message at $(date)\"; sleep 5; done'"
     numprocs: 1
     autostart: true
-    autorestart: always
-    exitcodes: [0]
+    autorestart: unexpected
+    exitcodes: [0, 143]
     starttime: 2
     startretries: 5
     stopsignal: TERM

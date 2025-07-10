@@ -11,10 +11,12 @@ import (
 	"taskmaster/internal/logger"
 	"taskmaster/internal/process"
 	"taskmaster/internal/shell"
+	"taskmaster/internal/web"
 )
 
 func main() {
 	var configFile = flag.String("config", "configs/example.yml", "Path to configuration file")
+	var webPort = flag.Int("web-port", 0, "Web server port (0 = disabled)")
 	flag.Parse()
 
 	// Initialize logger
@@ -36,6 +38,20 @@ func main() {
 
 	// Initialize process manager
 	processManager := process.NewManager(cfg, appLogger)
+
+	// Initialize web server only if port is specified
+	if *webPort > 0 {
+		webServer := web.NewServer(*webPort, processManager, appLogger)
+		appLogger.SetBroadcaster(webServer.GetHub())
+
+		// Start web server in background
+		go func() {
+			appLogger.Info("🌐 Starting web server on port %d", *webPort)
+			if err := webServer.Start(); err != nil {
+				appLogger.Error("Web server failed: %v", err)
+			}
+		}()
+	}
 
 	// Start processes marked as autostart
 	if err := processManager.StartAutoStartProcesses(); err != nil {

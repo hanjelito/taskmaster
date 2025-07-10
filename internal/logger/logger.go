@@ -7,9 +7,14 @@ import (
 	"time"
 )
 
+type LogBroadcaster interface {
+	BroadcastLog(level, message, program string)
+}
+
 type Logger struct {
-	file *os.File
-	log  *log.Logger
+	file        *os.File
+	log         *log.Logger
+	broadcaster LogBroadcaster
 }
 
 func New(filename string) (*Logger, error) {
@@ -33,6 +38,11 @@ func (l *Logger) logf(level string, format string, args ...interface{}) {
 
 	// También mostrar en consola para debugging
 	fmt.Printf("[%s] %s: %s\n", timestamp, level, message)
+	
+	// Broadcast to WebSocket clients if broadcaster is available
+	if l.broadcaster != nil {
+		l.broadcaster.BroadcastLog(level, message, "taskmaster")
+	}
 }
 
 func (l *Logger) Info(format string, args ...interface{}) {
@@ -50,4 +60,8 @@ func (l *Logger) Fatal(format string, args ...interface{}) {
 
 func (l *Logger) Close() error {
 	return l.file.Close()
+}
+
+func (l *Logger) SetBroadcaster(broadcaster LogBroadcaster) {
+	l.broadcaster = broadcaster
 }

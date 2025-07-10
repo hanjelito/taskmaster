@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taskmaster Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background-color: #2d2d2d;
+            padding: 1rem;
+            border-bottom: 1px solid #404040;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #4fc3f7;
+            font-size: 1.8rem;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .status-connected {
+            background-color: #2e7d32;
+            color: white;
+        }
+
+        .status-disconnected {
+            background-color: #d32f2f;
+            color: white;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 300px;
+            background-color: #2d2d2d;
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            color: #4fc3f7;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .process-list {
+            list-style: none;
+        }
+
+        .process-item {
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background-color: #404040;
+            border-radius: 4px;
+            border-left: 4px solid #666;
+        }
+
+        .process-item.running {
+            border-left-color: #4caf50;
+        }
+
+        .process-item.stopped {
+            border-left-color: #f44336;
+        }
+
+        .process-item.starting {
+            border-left-color: #ff9800;
+        }
+
+        .process-name {
+            font-weight: bold;
+            color: #e0e0e0;
+        }
+
+        .process-status {
+            font-size: 0.8rem;
+            color: #b0b0b0;
+            margin-top: 0.2rem;
+        }
+
+        .log-container {
+            flex: 1;
+            background-color: #2d2d2d;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .log-header {
+            padding: 1rem;
+            border-bottom: 1px solid #404040;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .log-header h2 {
+            color: #4fc3f7;
+            font-size: 1.2rem;
+        }
+
+        .log-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary {
+            background-color: #4fc3f7;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #29b6f6;
+        }
+
+        .btn-secondary {
+            background-color: #666;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #555;
+        }
+
+        .log-content {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .log-entry {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            background-color: #3a3a3a;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .log-timestamp {
+            color: #888;
+            font-size: 0.8rem;
+            min-width: 130px;
+        }
+
+        .log-level {
+            font-weight: bold;
+            min-width: 60px;
+        }
+
+        .log-level.INFO {
+            color: #4fc3f7;
+        }
+
+        .log-level.ERROR {
+            color: #f44336;
+        }
+
+        .log-level.WARN {
+            color: #ff9800;
+        }
+
+        .log-level.DEBUG {
+            color: #9c27b0;
+        }
+
+        .log-program {
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .log-message {
+            color: #e0e0e0;
+            flex: 1;
+        }
+
+        .stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-item {
+            background-color: #404040;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #4fc3f7;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #b0b0b0;
+        }
+
+        .no-logs {
+            text-align: center;
+            color: #888;
+            padding: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                max-height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Taskmaster Monitor</h1>
+        <div id="connectionStatus" class="status-badge status-disconnected">
+            <div class="status-dot"></div>
+            <span>Desconectado</span>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <h2>Procesos</h2>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalProcesses">0</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="runningProcesses">0</div>
+                    <div class="stat-label">Activos</div>
+                </div>
+            </div>
+            <ul class="process-list" id="processList">
+                <li class="no-logs">Cargando procesos...</li>
+            </ul>
+        </div>
+
+        <div class="log-container">
+            <div class="log-header">
+                <h2>Logs en Tiempo Real</h2>
+                <div class="log-controls">
+                    <button class="btn btn-secondary" onclick="clearLogs()">Limpiar</button>
+                    <button class="btn btn-primary" onclick="toggleAutoScroll()">
+                        <span id="autoScrollText">Auto-scroll: ON</span>
+                    </button>
+                </div>
+            </div>
+            <div class="log-content" id="logContent">
+                <div class="no-logs">Conectando al servidor...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let autoScroll = true;
+        let maxLogs = 1000;
+        let logCount = 0;
+
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws`;
+            
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = function() {
+                console.log('Conectado al WebSocket');
+                updateConnectionStatus(true);
+                clearLogs();
+                addLogEntry('SYSTEM', 'Conectado al servidor', new Date());
+            };
+            
+            ws.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    handleMessage(data);
+                } catch (error) {
+                    console.error('Error parsing message:', error);
+                }
+            };
+            
+            ws.onclose = function() {
+                console.log('Desconectado del WebSocket');
+                updateConnectionStatus(false);
+                addLogEntry('SYSTEM', 'Desconectado del servidor', new Date());
+                
+                // Reconectar después de 3 segundos
+                setTimeout(connectWebSocket, 3000);
+            };
+            
+            ws.onerror = function(error) {
+                console.error('WebSocket error:', error);
+                addLogEntry('ERROR', 'Error de conexión WebSocket', new Date());
+            };
+        }
+
+        function handleMessage(data) {
+            switch (data.type) {
+                case 'log':
+                    addLogEntry(data.data.level, data.data.message, new Date(data.timestamp), data.data.program);
+                    break;
+                case 'status':
+                    updateProcessList(data.data);
+                    break;
+                default:
+                    console.log('Mensaje desconocido:', data);
+            }
+        }
+
+        function updateConnectionStatus(connected) {
+            const statusEl = document.getElementById('connectionStatus');
+            if (connected) {
+                statusEl.className = 'status-badge status-connected';
+                statusEl.innerHTML = '<div class="status-dot"></div><span>Conectado</span>';
+            } else {
+                statusEl.className = 'status-badge status-disconnected';
+                statusEl.innerHTML = '<div class="status-dot"></div><span>Desconectado</span>';
+            }
+        }
+
+        function addLogEntry(level, message, timestamp, program = null) {
+            const logContent = document.getElementById('logContent');
+            
+            // Eliminar mensaje de "no logs" si existe
+            const noLogs = logContent.querySelector('.no-logs');
+            if (noLogs) {
+                noLogs.remove();
+            }
+            
+            // Limitar número de logs
+            if (logCount >= maxLogs) {
+                const firstLog = logContent.querySelector('.log-entry');
+                if (firstLog) {
+                    firstLog.remove();
+                    logCount--;
+                }
+            }
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            
+            const timestampStr = timestamp.toLocaleString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                fractionalSecondDigits: 3
+            });
+            
+            logEntry.innerHTML = `
+                <span class="log-timestamp">${timestampStr}</span>
+                <span class="log-level ${level}">${level}</span>
+                ${program ? `<span class="log-program">[${program}]</span>` : ''}
+                <span class="log-message">${escapeHtml(message)}</span>
+            `;
+            
+            logContent.appendChild(logEntry);
+            logCount++;
+            
+            if (autoScroll) {
+                logContent.scrollTop = logContent.scrollHeight;
+            }
+        }
+
+        function updateProcessList(processes) {
+            const processList = document.getElementById('processList');
+            const totalEl = document.getElementById('totalProcesses');
+            const runningEl = document.getElementById('runningProcesses');
+            
+            processList.innerHTML = '';
+            
+            let totalCount = 0;
+            let runningCount = 0;
+            
+            for (const [name, instances] of Object.entries(processes)) {
+                totalCount += instances.length;
+                
+                instances.forEach(instance => {
+                    const li = document.createElement('li');
+                    li.className = `process-item ${instance.state.toLowerCase()}`;
+                    
+                    if (instance.state === 'RUNNING') {
+                        runningCount++;
+                    }
+                    
+                    li.innerHTML = `
+                        <div class="process-name">${name}</div>
+                        <div class="process-status">${instance.state} (PID: ${instance.pid || 'N/A'})</div>
+                    `;
+                    
+                    processList.appendChild(li);
+                });
+            }
+            
+            totalEl.textContent = totalCount;
+            runningEl.textContent = runningCount;
+            
+            if (totalCount === 0) {
+                const li = document.createElement('li');
+                li.className = 'no-logs';
+                li.textContent = 'No hay procesos configurados';
+                processList.appendChild(li);
+            }
+        }
+
+        function clearLogs() {
+            const logContent = document.getElementById('logContent');
+            logContent.innerHTML = '';
+            logCount = 0;
+        }
+
+        function toggleAutoScroll() {
+            autoScroll = !autoScroll;
+            const autoScrollText = document.getElementById('autoScrollText');
+            autoScrollText.textContent = `Auto-scroll: ${autoScroll ? 'ON' : 'OFF'}`;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Inicializar conexión WebSocket
+        connectWebSocket();
+
+        // Solicitar estado inicial
+        setTimeout(() => {
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Estado inicial obtenido');
+                })
+                .catch(error => {
+                    console.error('Error obteniendo estado inicial:', error);
+                });
+        }, 1000);
+    </script>
+</body>
+</html>
