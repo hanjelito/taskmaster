@@ -43,6 +43,7 @@ func main() {
 	if *webPort > 0 {
 		webServer := web.NewServer(*webPort, processManager, appLogger)
 		appLogger.SetBroadcaster(webServer.GetHub())
+		processManager.SetStatusBroadcaster(webServer.GetHub())
 
 		// Start web server in background
 		go func() {
@@ -57,6 +58,9 @@ func main() {
 	if err := processManager.StartAutoStartProcesses(); err != nil {
 		appLogger.Error("Failed to start some processes: %v", err)
 	}
+
+	// Start periodic status checking
+	processManager.StartPeriodicStatusCheck()
 
 	// Handle SIGHUP for config reload
 	go handleSignals(processManager, appLogger, *configFile)

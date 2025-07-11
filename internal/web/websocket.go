@@ -198,20 +198,22 @@ func (c *Client) writePump() {
 				return
 			}
 
-			w, err := c.conn.NextWriter(websocket.TextMessage)
-			if err != nil {
+			c.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+			if err := c.conn.WriteMessage(websocket.TextMessage, message); err != nil {
 				return
 			}
-			w.Write(message)
 
-			n := len(c.send)
-			for i := 0; i < n; i++ {
-				w.Write([]byte{'\n'})
-				w.Write(<-c.send)
-			}
-
-			if err := w.Close(); err != nil {
-				return
+			// Send any additional messages that are queued
+		drainLoop:
+			for {
+				select {
+				case msg := <-c.send:
+					if err := c.conn.WriteMessage(websocket.TextMessage, msg); err != nil {
+						return
+					}
+				default:
+					break drainLoop
+				}
 			}
 
 		case <-ticker.C:

@@ -13,6 +13,7 @@ func (m *Manager) monitorProcess(instance *ProcessInstance, programName string) 
 	if instance.Cmd.ProcessState == nil {
 		instance.State = StateRunning
 		m.logger.Info("Process %s successfully started and running", instance.Name)
+		m.broadcastStatus()
 	}
 
 	err := instance.Cmd.Wait()
@@ -22,6 +23,7 @@ func (m *Manager) monitorProcess(instance *ProcessInstance, programName string) 
 	if instance.ManualStop {
 		m.logger.Info("Process %s stopped gracefully", instance.Name)
 		instance.State = StateStopped
+		m.broadcastStatus()
 		return
 	}
 
@@ -81,12 +83,14 @@ func (m *Manager) attemptRestart(instance *ProcessInstance, programName string) 
 
 	instance.State = StateRestarting
 	instance.RestartCount++
+	m.broadcastStatus()
 
 	time.Sleep(time.Second)
 
 	if err := m.startProcessInstance(instance, programName); err != nil {
 		m.logger.Error("Failed to restart process %s: %v", instance.Name, err)
 		instance.State = StateFailed
+		m.broadcastStatus()
 	}
 }
 
@@ -95,6 +99,7 @@ func (m *Manager) finalizeProcess(instance *ProcessInstance, exitCode int) {
 	if instance.RestartCount >= instance.Config.StartRetries {
 		m.logger.Error("Process %s failed too many times, giving up", instance.Name)
 		instance.State = StateFailed
+		m.broadcastStatus()
 		return
 	}
 
@@ -114,6 +119,7 @@ func (m *Manager) finalizeProcess(instance *ProcessInstance, exitCode int) {
 			instance.State = StateFailed
 		}
 	}
+	m.broadcastStatus()
 }
 
 // shouldRestart determina si un proceso debe reiniciarse

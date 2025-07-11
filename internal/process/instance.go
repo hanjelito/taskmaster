@@ -31,6 +31,9 @@ func (m *Manager) startProcessInstance(instance *ProcessInstance, programName st
 
 	go m.monitorProcess(instance, programName)
 
+	// Broadcast status update
+	m.broadcastStatus()
+
 	return nil
 }
 
@@ -138,5 +141,9 @@ func (m *Manager) stopProcessInstance(instance *ProcessInstance) bool {
 	}
 
 	instance.State = StateStopped
+	
+	// Broadcast status update
+	m.broadcastStatus()
+	
 	return true
 }

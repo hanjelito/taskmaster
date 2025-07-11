@@ -8,26 +8,32 @@ import (
 	"time"
 )
 
+// StatusBroadcaster es la interfaz para enviar actualizaciones de estado
+type StatusBroadcaster interface {
+	BroadcastStatus(status interface{})
+}
+
 // Manager gestiona múltiples procesos y sus instancias
 type Manager struct {
-	processes map[string][]*ProcessInstance
-	config    *config.Config
-	logger    *logger.Logger
-	mutex     sync.RWMutex
+	processes   map[string][]*ProcessInstance
+	config      *config.Config
+	logger      *logger.Logger
+	mutex       sync.RWMutex
+	broadcaster StatusBroadcaster
 }
 
 // ProcessInstance representa una instancia específica de un proceso
 type ProcessInstance struct {
-	Name         string
-	Config       *ProcessConfig
-	Cmd          *exec.Cmd
-	PID          int
-	State        ProcessState
-	StartTime    time.Time
-	ExitCode     int
-	RestartCount int
-	StopChan     chan bool
-	ManualStop   bool
+	Name         string       `json:"name"`
+	Config       *ProcessConfig `json:"-"`
+	Cmd          *exec.Cmd    `json:"-"`
+	PID          int          `json:"pid"`
+	State        ProcessState `json:"state"`
+	StartTime    time.Time    `json:"start_time"`
+	ExitCode     int          `json:"exit_code"`
+	RestartCount int          `json:"restart_count"`
+	StopChan     chan bool    `json:"-"`
+	ManualStop   bool         `json:"manual_stop"`
 }
 
 // ProcessState representa el estado actual de un proceso
@@ -54,6 +60,11 @@ func (s ProcessState) String() string {
 		return state
 	}
 	return "UNKNOWN"
+}
+
+// MarshalJSON implements json.Marshaler interface to serialize ProcessState as string
+func (s ProcessState) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + s.String() + `"`), nil
 }
 
 // ProcessConfig contiene la configuración de un proceso
