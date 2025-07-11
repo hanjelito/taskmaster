@@ -1,0 +1,21 @@
+programs:
+  # Programa de prueba simple
+  test_app:
+    cmd: "sleep 10"
+    numprocs: 2
+    autostart: true
+    autorestart: true
+
+  # Programa que genera output
+  counter:
+    cmd: "bash -c 'for i in {1..20}; do echo \"Contador: $i\"; sleep 1; done'"
+    numprocs: 1
+    autostart: false
+    autorestart: false
+
+  # Programa de larga duración
+  long_task:
+    cmd: "sleep 30"
+    numprocs: 1
+    autostart: false
+    autorestart: true
