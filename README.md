@@ -151,6 +151,7 @@ taskmaster> reload
 
 ### Mediante señal SIGHUP
 ```bash
+(ps aux | grep taskmaster | grep -v grep)
 # Desde otra terminal
 kill -HUP <pid-taskmaster>
 ```
