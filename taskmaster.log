@@ -1,0 +1,275 @@
+[2025-07-21 23:44:31] INFO: 🚀 Starting Taskmaster...
+[2025-07-21 23:44:31] INFO: ✅ Configuration loaded from configs/example.yml
+[2025-07-21 23:44:31] INFO: Started process test_program_0 (PID: 5558)
+[2025-07-21 23:44:31] INFO: Started process test_program_1 (PID: 5559)
+[2025-07-21 23:44:31] INFO: Started process logger_program_0 (PID: 5560)
+[2025-07-21 23:44:31] INFO: Started process worker_pool_0 (PID: 5561)
+[2025-07-21 23:44:31] INFO: Started process worker_pool_1 (PID: 5562)
+[2025-07-21 23:44:31] INFO: Started process worker_pool_2 (PID: 5563)
+[2025-07-21 23:44:31] INFO: Started process worker_pool_3 (PID: 5564)
+[2025-07-21 23:44:31] INFO: 🎮 Starting interactive shell...
+[2025-07-21 23:44:33] INFO: Process logger_program_0 successfully started and running
+[2025-07-21 23:44:33] INFO: Process worker_pool_0 successfully started and running
+[2025-07-21 23:44:33] INFO: Process worker_pool_1 successfully started and running
+[2025-07-21 23:44:33] INFO: Process worker_pool_2 successfully started and running
+[2025-07-21 23:44:33] INFO: Process worker_pool_3 successfully started and running
+[2025-07-21 23:44:34] INFO: Process test_program_0 successfully started and running
+[2025-07-21 23:44:34] INFO: Process test_program_1 successfully started and running
+[2025-07-21 23:44:42] INFO: Process worker_pool_2 exited normally
+[2025-07-21 23:44:42] INFO: Process worker_pool_2 terminated naturally with expected code 0
+[2025-07-21 23:44:52] INFO: Process worker_pool_1 exited normally
+[2025-07-21 23:44:52] INFO: Process worker_pool_1 terminated naturally with expected code 0
+[2025-07-21 23:44:53] INFO: Process worker_pool_0 exited normally
+[2025-07-21 23:44:53] INFO: Process worker_pool_0 terminated naturally with expected code 0
+[2025-07-21 23:45:00] INFO: Process worker_pool_3 exited normally
+[2025-07-21 23:45:00] INFO: Process worker_pool_3 terminated naturally with expected code 0
+[2025-07-21 23:45:01] INFO: Process test_program_0 exited normally
+[2025-07-21 23:45:01] INFO: Process test_program_0 terminated naturally with expected code 0
+[2025-07-21 23:45:01] INFO: Process test_program_1 exited normally
+[2025-07-21 23:45:01] INFO: Process test_program_1 terminated naturally with expected code 0
+[2025-07-21 23:45:19] INFO: Auto-cleaned 4 dead instances for program worker_pool
+[2025-07-21 23:45:19] INFO: Started process worker_pool_0 (PID: 5776)
+[2025-07-21 23:45:19] INFO: Started process worker_pool_1 (PID: 5777)
+[2025-07-21 23:45:19] INFO: Started process worker_pool_2 (PID: 5778)
+[2025-07-21 23:45:19] INFO: Started process worker_pool_3 (PID: 5779)
+[2025-07-21 23:45:21] INFO: Process worker_pool_0 successfully started and running
+[2025-07-21 23:45:21] INFO: Process worker_pool_1 successfully started and running
+[2025-07-21 23:45:21] INFO: Process worker_pool_2 successfully started and running
+[2025-07-21 23:45:21] INFO: Process worker_pool_3 successfully started and running
+[2025-07-21 23:45:35] INFO: Process worker_pool_3 exited normally
+[2025-07-21 23:45:35] INFO: Process worker_pool_3 terminated naturally with expected code 0
+[2025-07-21 23:45:36] INFO: Process worker_pool_0 exited normally
+[2025-07-21 23:45:36] INFO: Process worker_pool_0 terminated naturally with expected code 0
+[2025-07-21 23:45:36] ERROR: Process worker_pool_1 exited with code 143
+[2025-07-21 23:45:36] INFO: Process worker_pool_1 terminated with unexpected code 143
+[2025-07-21 23:45:45] INFO: Process worker_pool_2 exited normally
+[2025-07-21 23:45:45] INFO: Process worker_pool_2 terminated naturally with expected code 0
+[2025-07-21 23:45:58] ERROR: Process logger_program_0 exited with code 143
+[2025-07-21 23:45:58] INFO: Process logger_program_0 terminated naturally with expected code 143
+[2025-07-21 23:46:44] INFO: Auto-cleaned 1 dead instances for program logger_program
+[2025-07-21 23:46:44] INFO: Started process logger_program_0 (PID: 5876)
+[2025-07-21 23:46:46] INFO: Process logger_program_0 successfully started and running
+[2025-07-21 23:46:57] ERROR: Process logger_program_0 exited with code 137
+[2025-07-21 23:46:57] INFO: Restarting process logger_program_0 (attempt 1/5)
+[2025-07-21 23:47:00] INFO: Process logger_program_0 successfully started and running
+[2025-07-21 23:47:25] ERROR: Process logger_program_0 exited with code 143
+[2025-07-21 23:47:25] INFO: Process logger_program_0 terminated naturally with expected code 143
+[2025-07-21 23:51:06] INFO: Auto-cleaned 1 dead instances for program logger_program
+[2025-07-21 23:51:06] INFO: Started process logger_program_0 (PID: 6094)
+[2025-07-21 23:51:08] INFO: Process logger_program_0 successfully started and running
+[2025-07-21 23:51:48] ERROR: Process logger_program_0 exited with code 129
+[2025-07-21 23:51:48] INFO: Restarting process logger_program_0 (attempt 1/5)
+[2025-07-21 23:51:51] INFO: Process logger_program_0 successfully started and running
+[2025-07-21 23:52:27] ERROR: Process logger_program_0 exited with code 129
+[2025-07-21 23:52:27] INFO: Restarting process logger_program_0 (attempt 2/5)
+[2025-07-21 23:52:30] INFO: Process logger_program_0 successfully started and running
+[2025-07-21 23:54:04] INFO: Program logger_program configuration changed, restarting
+[2025-07-21 23:54:04] INFO: Stopping process logger_program_0 with signal TERM (timeout: 15s)
+[2025-07-21 23:54:04] INFO: Process logger_program_0 stopped gracefully
+[2025-07-21 23:54:04] INFO: Successfully stopped 1 process(es) for program logger_program
+[2025-07-21 23:54:04] INFO: Auto-cleaned 1 dead instances for program logger_program
+[2025-07-21 23:54:04] INFO: Started process logger_program_0 (PID: 6322)
+[2025-07-21 23:54:04] INFO: Started process logger_program_1 (PID: 6323)
+[2025-07-21 23:54:04] INFO: Configuration reloaded successfully
+[2025-07-21 23:54:06] INFO: Process logger_program_0 successfully started and running
+[2025-07-21 23:54:06] INFO: Process logger_program_1 successfully started and running
+[2025-07-21 23:54:29] ERROR: Process logger_program_0 exited with code 129
+[2025-07-21 23:54:29] INFO: Process logger_program_0 terminated naturally with expected code 129
+[2025-07-21 23:54:44] ERROR: Process logger_program_1 exited with code 129
+[2025-07-21 23:54:44] INFO: Process logger_program_1 terminated naturally with expected code 129
+[2025-07-21 23:59:38] INFO: Started process custom_signal_program_0 (PID: 6443)
+[2025-07-21 23:59:41] INFO: Process custom_signal_program_0 successfully started and running
+[2025-07-22 00:01:19] INFO: Process custom_signal_program_0 exited normally
+[2025-07-22 00:01:19] INFO: Process custom_signal_program_0 terminated naturally with expected code 0
+[2025-07-22 00:02:10] INFO: Auto-cleaned 2 dead instances for program logger_program
+[2025-07-22 00:02:10] INFO: Started process logger_program_0 (PID: 6625)
+[2025-07-22 00:02:10] INFO: Started process logger_program_1 (PID: 6626)
+[2025-07-22 00:02:12] INFO: Process logger_program_0 successfully started and running
+[2025-07-22 00:02:12] INFO: Process logger_program_1 successfully started and running
+[2025-07-22 00:02:28] INFO: Program logger_program configuration changed, restarting
+[2025-07-22 00:02:28] INFO: Stopping process logger_program_0 with signal TERM (timeout: 15s)
+[2025-07-22 00:02:28] INFO: Process logger_program_0 stopped gracefully
+[2025-07-22 00:02:28] INFO: Stopping process logger_program_1 with signal TERM (timeout: 15s)
+[2025-07-22 00:02:28] INFO: Process logger_program_1 stopped gracefully
+[2025-07-22 00:02:28] INFO: Successfully stopped 2 process(es) for program logger_program
+[2025-07-22 00:02:28] INFO: Auto-cleaned 2 dead instances for program logger_program
+[2025-07-22 00:02:28] INFO: Started process logger_program_0 (PID: 6659)
+[2025-07-22 00:02:28] INFO: Configuration reloaded successfully
+[2025-07-22 00:02:30] INFO: Process logger_program_0 successfully started and running
+[2025-07-22 00:02:44] ERROR: Process logger_program_0 exited with code 143
+[2025-07-22 00:02:44] INFO: Process logger_program_0 terminated naturally with expected code 143
+[2025-07-22 00:03:11] INFO: Program logger_program configuration changed, restarting
+[2025-07-22 00:03:11] INFO: Process logger_program_0 already finished, no need to stop
+[2025-07-22 00:03:11] INFO: Auto-cleaned 1 dead instances for program logger_program
+[2025-07-22 00:03:11] INFO: Started process logger_program_0 (PID: 6705)
+[2025-07-22 00:03:11] INFO: Configuration reloaded successfully
+[2025-07-22 00:03:13] INFO: Process logger_program_0 successfully started and running
+[2025-07-22 00:03:21] ERROR: Process logger_program_0 exited with code 143
+[2025-07-22 00:03:21] INFO: Restarting process logger_program_0 (attempt 1/5)
+[2025-07-22 00:03:24] INFO: Process logger_program_0 successfully started and running
+[2025-07-22 00:17:00] INFO: Program logger_program configuration changed, restarting
+[2025-07-22 00:17:00] INFO: Stopping process logger_program_0 with signal TERM (timeout: 15s)
+[2025-07-22 00:17:00] INFO: Process logger_program_0 stopped gracefully
+[2025-07-22 00:17:00] INFO: Successfully stopped 1 process(es) for program logger_program
+[2025-07-22 00:17:00] INFO: Auto-cleaned 1 dead instances for program logger_program
+[2025-07-22 00:17:00] INFO: Started process logger_program_0 (PID: 7297)
+[2025-07-22 00:17:00] INFO: Configuration reloaded successfully
+[2025-07-22 00:17:02] INFO: Process logger_program_0 successfully started and running
+[2025-07-22 00:17:08] INFO: Configuration reloaded successfully
+[2025-07-22 00:17:22] INFO: Configuration reloaded successfully
+[2025-07-22 00:19:12] INFO: Program logger_program configuration changed, restarting
+[2025-07-22 00:19:12] INFO: Stopping process logger_program_0 with signal HUP (timeout: 15s)
+[2025-07-22 00:19:12] INFO: Process logger_program_0 stopped gracefully
+[2025-07-22 00:19:12] INFO: Successfully stopped 1 process(es) for program logger_program
+[2025-07-22 00:19:12] INFO: Auto-cleaned 1 dead instances for program logger_program
+[2025-07-22 00:19:12] INFO: Started process logger_program_0 (PID: 7403)
+[2025-07-22 00:19:12] INFO: Configuration reloaded successfully
+[2025-07-22 00:19:14] INFO: Process logger_program_0 successfully started and running
+[2025-07-22 00:30:20] ERROR: Process logger_program_0 exited with code 143
+[2025-07-22 00:30:20] INFO: Process logger_program_0 terminated naturally with expected code 143
+[2025-07-22 00:31:22] INFO: Auto-cleaned 1 dead instances for program logger_program
+[2025-07-22 00:31:22] INFO: Started process logger_program_0 (PID: 9125)
+[2025-07-22 00:31:24] INFO: Process logger_program_0 successfully started and running
+[2025-07-22 00:31:34] ERROR: Process logger_program_0 exited with code 143
+[2025-07-22 00:31:34] INFO: Process logger_program_0 terminated naturally with expected code 143
+[2025-07-22 00:31:45] INFO: Configuration reloaded successfully
+[2025-07-22 00:32:00] INFO: Auto-cleaned 1 dead instances for program logger_program
+[2025-07-22 00:32:00] INFO: Started process logger_program_0 (PID: 9184)
+[2025-07-22 00:32:02] INFO: Process logger_program_0 successfully started and running
+[2025-07-22 00:32:07] ERROR: Process logger_program_0 exited with code 143
+[2025-07-22 00:32:07] INFO: Process logger_program_0 terminated naturally with expected code 143
+[2025-07-22 00:32:33] INFO: Program logger_program configuration changed, restarting
+[2025-07-22 00:32:33] INFO: Process logger_program_0 already finished, no need to stop
+[2025-07-22 00:32:33] INFO: Auto-cleaned 1 dead instances for program logger_program
+[2025-07-22 00:32:33] INFO: Started process logger_program_0 (PID: 9232)
+[2025-07-22 00:32:33] INFO: Configuration reloaded successfully
+[2025-07-22 00:32:35] INFO: Process logger_program_0 successfully started and running
+[2025-07-22 00:32:40] ERROR: Process logger_program_0 exited with code 143
+[2025-07-22 00:32:40] INFO: Restarting process logger_program_0 (attempt 1/5)
+[2025-07-22 00:32:43] INFO: Process logger_program_0 successfully started and running
+[2025-07-22 00:38:32] INFO: Stopping process logger_program_0 with signal TERM (timeout: 15s)
+[2025-07-22 00:38:32] INFO: Process logger_program_0 stopped gracefully
+[2025-07-22 00:38:32] INFO: Successfully stopped 1 process(es) for program logger_program
+[2025-07-22 00:41:03] INFO: Auto-cleaned 1 dead instances for program logger_program
+[2025-07-22 00:41:03] INFO: Started process logger_program_0 (PID: 10266)
+[2025-07-22 00:41:05] INFO: Process logger_program_0 successfully started and running
+[2025-07-22 00:42:49] INFO: 🛑 Shutting down Taskmaster...
+[2025-07-22 00:42:49] INFO: Process custom_signal_program_0 already finished, no need to stop
+[2025-07-22 00:42:49] INFO: Process test_program_0 already finished, no need to stop
+[2025-07-22 00:42:49] INFO: Process test_program_1 already finished, no need to stop
+[2025-07-22 00:42:49] INFO: Stopping process logger_program_0 with signal TERM (timeout: 15s)
+[2025-07-22 00:42:49] INFO: Process logger_program_0 stopped gracefully
+[2025-07-22 00:42:49] INFO: Successfully stopped 1 process(es) for program logger_program
+[2025-07-22 00:42:49] INFO: Process worker_pool_0 already finished, no need to stop
+[2025-07-22 00:42:49] INFO: Process worker_pool_1 already finished, no need to stop
+[2025-07-22 00:42:49] INFO: Process worker_pool_2 already finished, no need to stop
+[2025-07-22 00:42:49] INFO: Process worker_pool_3 already finished, no need to stop
+[2025-07-22 00:42:49] INFO: 👋 Taskmaster shutdown complete
+[2025-07-22 00:42:55] INFO: 🚀 Starting Taskmaster...
+[2025-07-22 00:42:55] INFO: ✅ Configuration loaded from configs/example.yml
+[2025-07-22 00:42:55] INFO: Started process test_program_0 (PID: 10531)
+[2025-07-22 00:42:55] INFO: Started process test_program_1 (PID: 10532)
+[2025-07-22 00:42:55] INFO: Started process logger_program_0 (PID: 10533)
+[2025-07-22 00:42:55] INFO: Started process worker_pool_0 (PID: 10534)
+[2025-07-22 00:42:55] INFO: Started process worker_pool_1 (PID: 10535)
+[2025-07-22 00:42:55] INFO: Started process worker_pool_2 (PID: 10536)
+[2025-07-22 00:42:55] INFO: Started process worker_pool_3 (PID: 10537)
+[2025-07-22 00:42:55] INFO: 🎮 Starting interactive shell...
+[2025-07-22 00:42:57] INFO: Process logger_program_0 successfully started and running
+[2025-07-22 00:42:57] INFO: Process worker_pool_0 successfully started and running
+[2025-07-22 00:42:57] INFO: Process worker_pool_1 successfully started and running
+[2025-07-22 00:42:57] INFO: Process worker_pool_2 successfully started and running
+[2025-07-22 00:42:57] INFO: Process worker_pool_3 successfully started and running
+[2025-07-22 00:42:58] INFO: Process test_program_0 successfully started and running
+[2025-07-22 00:42:58] INFO: Process test_program_1 successfully started and running
+[2025-07-22 00:43:11] INFO: Process worker_pool_1 exited normally
+[2025-07-22 00:43:11] INFO: Process worker_pool_1 terminated naturally with expected code 0
+[2025-07-22 00:43:12] INFO: Process worker_pool_0 exited normally
+[2025-07-22 00:43:12] INFO: Process worker_pool_0 terminated naturally with expected code 0
+[2025-07-22 00:43:19] INFO: Process worker_pool_3 exited normally
+[2025-07-22 00:43:19] INFO: Process worker_pool_3 terminated naturally with expected code 0
+[2025-07-22 00:43:21] INFO: Process worker_pool_2 exited normally
+[2025-07-22 00:43:21] INFO: Process worker_pool_2 terminated naturally with expected code 0
+[2025-07-22 00:43:25] INFO: Process test_program_0 exited normally
+[2025-07-22 00:43:25] INFO: Process test_program_1 exited normally
+[2025-07-22 00:43:25] INFO: Process test_program_1 terminated naturally with expected code 0
+[2025-07-22 00:43:25] INFO: Process test_program_0 terminated naturally with expected code 0
+[2025-07-22 00:44:39] ERROR: Process logger_program_0 exited with code 143
+[2025-07-22 00:44:39] INFO: Restarting process logger_program_0 (attempt 1/5)
+[2025-07-22 00:44:42] INFO: Process logger_program_0 successfully started and running
+[2025-07-22 00:46:35] INFO: 🛑 Shutting down Taskmaster...
+[2025-07-22 00:46:35] INFO: Process worker_pool_0 already finished, no need to stop
+[2025-07-22 00:46:35] INFO: Process worker_pool_1 already finished, no need to stop
+[2025-07-22 00:46:35] INFO: Process worker_pool_2 already finished, no need to stop
+[2025-07-22 00:46:35] INFO: Process worker_pool_3 already finished, no need to stop
+[2025-07-22 00:46:35] INFO: Process test_program_0 already finished, no need to stop
+[2025-07-22 00:46:35] INFO: Process test_program_1 already finished, no need to stop
+[2025-07-22 00:46:35] INFO: Stopping process logger_program_0 with signal TERM (timeout: 15s)
+[2025-07-22 00:46:35] INFO: Process logger_program_0 stopped gracefully
+[2025-07-22 00:46:35] INFO: Successfully stopped 1 process(es) for program logger_program
+[2025-07-22 00:46:35] INFO: 👋 Taskmaster shutdown complete
+[2025-07-22 00:46:37] INFO: 🚀 Starting Taskmaster...
+[2025-07-22 00:46:37] INFO: ✅ Configuration loaded from configs/example.yml
+[2025-07-22 00:46:37] INFO: Started process test_program_0 (PID: 11317)
+[2025-07-22 00:46:37] INFO: Started process test_program_1 (PID: 11318)
+[2025-07-22 00:46:37] INFO: Started process logger_program_0 (PID: 11319)
+[2025-07-22 00:46:37] INFO: Started process worker_pool_0 (PID: 11320)
+[2025-07-22 00:46:37] INFO: Started process worker_pool_1 (PID: 11321)
+[2025-07-22 00:46:37] INFO: Started process worker_pool_2 (PID: 11322)
+[2025-07-22 00:46:37] INFO: Started process worker_pool_3 (PID: 11323)
+[2025-07-22 00:46:37] INFO: 🎮 Starting interactive shell...
+[2025-07-22 00:46:39] INFO: Process worker_pool_0 successfully started and running
+[2025-07-22 00:46:39] INFO: Process logger_program_0 successfully started and running
+[2025-07-22 00:46:39] INFO: Process worker_pool_1 successfully started and running
+[2025-07-22 00:46:39] INFO: Process worker_pool_2 successfully started and running
+[2025-07-22 00:46:39] INFO: Process worker_pool_3 successfully started and running
+[2025-07-22 00:46:40] INFO: Process test_program_1 successfully started and running
+[2025-07-22 00:46:40] INFO: Process test_program_0 successfully started and running
+[2025-07-22 00:46:50] INFO: Process worker_pool_3 exited normally
+[2025-07-22 00:46:50] INFO: Process worker_pool_3 terminated naturally with expected code 0
+[2025-07-22 00:46:52] INFO: Process worker_pool_2 exited normally
+[2025-07-22 00:46:52] INFO: Process worker_pool_2 terminated naturally with expected code 0
+[2025-07-22 00:46:52] ERROR: Process logger_program_0 exited with code 143
+[2025-07-22 00:46:52] INFO: Restarting process logger_program_0 (attempt 1/5)
+[2025-07-22 00:46:55] INFO: Process logger_program_0 successfully started and running
+[2025-07-22 00:47:02] INFO: Process worker_pool_1 exited normally
+[2025-07-22 00:47:02] INFO: Process worker_pool_1 terminated naturally with expected code 0
+[2025-07-22 00:47:03] INFO: Process worker_pool_0 exited normally
+[2025-07-22 00:47:03] INFO: Process worker_pool_0 terminated naturally with expected code 0
+[2025-07-22 00:47:07] INFO: Process test_program_0 exited normally
+[2025-07-22 00:47:07] INFO: Process test_program_1 exited normally
+[2025-07-22 00:47:07] INFO: Process test_program_1 terminated naturally with expected code 0
+[2025-07-22 00:47:07] INFO: Process test_program_0 terminated naturally with expected code 0
+[2025-07-22 00:47:43] ERROR: Process logger_program_0 exited with code 143
+[2025-07-22 00:47:43] INFO: Restarting process logger_program_0 (attempt 2/5)
+[2025-07-22 00:47:46] INFO: Process logger_program_0 successfully started and running
+[2025-07-22 00:48:25] INFO: Stopping process logger_program_0 with signal TERM (timeout: 15s)
+[2025-07-22 00:48:29] INFO: Process logger_program_0 stopped gracefully
+[2025-07-22 00:48:29] INFO: Successfully stopped 1 process(es) for program logger_program
+[2025-07-22 00:48:48] INFO: Auto-cleaned 1 dead instances for program logger_program
+[2025-07-22 00:48:48] INFO: Started process logger_program_0 (PID: 11550)
+[2025-07-22 00:48:50] INFO: Process logger_program_0 successfully started and running
+[2025-07-22 00:49:08] ERROR: Process logger_program_0 exited with code 143
+[2025-07-22 00:49:08] INFO: Restarting process logger_program_0 (attempt 1/5)
+[2025-07-22 00:49:11] INFO: Process logger_program_0 successfully started and running
+[2025-07-22 00:50:41] INFO: Stopping process logger_program_0 with signal TERM (timeout: 15s)
+[2025-07-22 00:50:45] INFO: Process logger_program_0 stopped gracefully
+[2025-07-22 00:50:45] INFO: Successfully stopped 1 process(es) for program logger_program
+[2025-07-22 00:51:40] INFO: Auto-cleaned 1 dead instances for program logger_program
+[2025-07-22 00:51:40] INFO: Started process logger_program_0 (PID: 11748)
+[2025-07-22 00:51:42] INFO: Process logger_program_0 successfully started and running
+[2025-07-22 00:52:15] ERROR: Process logger_program_0 exited with code 143
+[2025-07-22 00:52:15] INFO: Restarting process logger_program_0 (attempt 1/5)
+[2025-07-22 00:52:18] INFO: Process logger_program_0 successfully started and running
+[2025-07-22 00:52:43] INFO: Stopping process logger_program_0 with signal TERM (timeout: 15s)
+[2025-07-22 00:52:46] INFO: Process logger_program_0 stopped gracefully
+[2025-07-22 00:52:46] INFO: Successfully stopped 1 process(es) for program logger_program
+[2025-07-22 00:53:14] INFO: 🛑 Shutting down Taskmaster...
+[2025-07-22 00:53:14] INFO: Process test_program_0 already finished, no need to stop
+[2025-07-22 00:53:14] INFO: Process test_program_1 already finished, no need to stop
+[2025-07-22 00:53:14] INFO: Process logger_program_0 already finished, no need to stop
+[2025-07-22 00:53:14] INFO: Process worker_pool_0 already finished, no need to stop
+[2025-07-22 00:53:14] INFO: Process worker_pool_1 already finished, no need to stop
+[2025-07-22 00:53:14] INFO: Process worker_pool_2 already finished, no need to stop
+[2025-07-22 00:53:14] INFO: Process worker_pool_3 already finished, no need to stop
+[2025-07-22 00:53:14] INFO: 👋 Taskmaster shutdown complete

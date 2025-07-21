@@ -20,11 +20,11 @@ programs:
 
   # Programa que genera output
   logger_program:
-    cmd: "bash -c 'while true; do echo \"Log message at $(date)\"; sleep 5; done'"
+    cmd: "bash -c 'trap \"echo RECEIVED SIGTERM at \\$(date); exit 143\" TERM; while true; do echo \"Log message at \\$(date)\"; sleep 5; done'"
     numprocs: 1
     autostart: true
     autorestart: unexpected
-    exitcodes: [0, 143]
+    exitcodes: [0]
     starttime: 2
     startretries: 5
     stopsignal: TERM
