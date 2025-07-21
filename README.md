@@ -6,9 +6,10 @@ Un demonio de control de trabajos similar a **supervisor**, implementado en Go.
 
 Taskmaster es un sistema de gestión de procesos que permite:
 - Iniciar, detener y reiniciar programas automáticamente
-- Monitorear el estado de los procesos
+- Monitorear el estado de los procesos en tiempo real
 - Recargar configuración sin interrumpir procesos no modificados
 - Control interactivo mediante shell integrado
+- **Interfaz web con WebSockets** para monitoreo en tiempo real
 - Logging completo de eventos
 
 ## 🛠️ Instalación
@@ -31,6 +32,9 @@ make build
 
 # O usar el script de construcción
 make build-script
+
+# Instalar en el sistema (opcional)
+make install
 ```
 
 ## 🚀 Uso
@@ -43,9 +47,17 @@ make build-script
 # Con configuración personalizada
 ./taskmaster -config configs/mi-config.yml
 
+# Con interfaz web habilitada (puerto 8080)
+./taskmaster --web-port=8080
+
+# Con configuración personalizada y web
+./taskmaster -config configs/mi-config.yml --web-port=8080
+
 # Usando Makefile
 make run
 make run-config CONFIG=configs/production.yml
+make run-web
+make run-web-config CONFIG=configs/production.yml
 ```
 
 ### Comandos del shell
@@ -56,9 +68,9 @@ taskmaster> help
 📚 Available commands:
   help     - Show this help message
   status   - Show status of all programs
-  start    - Start a program
-  stop     - Stop a program
-  restart  - Restart a program
+  start    - Start a program (ej: start test_program)
+  stop     - Stop a program (ej: stop test_program)
+  restart  - Restart a program (ej: restart test_program)
   reload   - Reload configuration file
   quit/exit - Exit taskmaster
 ```
@@ -66,10 +78,27 @@ taskmaster> help
 ### Ejemplos de uso
 ```bash
 taskmaster> status
+NAME                 STATE        PID      UPTIME     RESTARTS
+----------------------------------------------------------------------
+test_program_0       STOPPED      -        N/A        0       
+test_program_1       STOPPED      -        N/A        0       
+logger_program_0     RUNNING      12767    185s       2
+
 taskmaster> start test_program
+[2025-07-22 00:58:18] INFO: Starting program test_program...
+[2025-07-22 00:58:18] INFO: Process test_program_0 successfully started
+
 taskmaster> stop test_program
+[2025-07-22 00:58:25] INFO: Stopping program test_program...
+[2025-07-22 00:58:25] INFO: Process test_program_0 stopped
+
 taskmaster> restart logger_program
+[2025-07-22 00:58:30] INFO: Restarting program logger_program...
+[2025-07-22 00:58:30] INFO: Process logger_program_0 restarted successfully
+
 taskmaster> reload
+[2025-07-22 00:58:35] INFO: 📁 Reloading configuration from configs/example.yml...
+[2025-07-22 00:58:35] INFO: ✅ Configuration reloaded successfully
 ```
 
 ## 📁 Estructura del proyecto
@@ -85,10 +114,15 @@ taskmaster/
 │   │   └── logger.go
 │   ├── process/            # Gestión de procesos
 │   │   └── manager.go
-│   └── shell/              # Shell interactivo
-│       └── shell.go
+│   ├── shell/              # Shell interactivo
+│   │   └── shell.go
+│   └── web/                # Servidor web y WebSockets
+│       ├── server.go
+│       └── websocket.go
 ├── pkg/signals/            # Utilidades de señales
 │   └── signals.go
+├── web/static/             # Archivos web estáticos
+│   └── index.html
 ├── configs/                # Archivos de configuración
 │   ├── example.yml
 │   └── test.yml
@@ -151,9 +185,16 @@ taskmaster> reload
 
 ### Mediante señal SIGHUP
 ```bash
-# Desde otra terminal
-kill -HUP <pid-taskmaster>
+# Desde otra terminal - IMPORTANTE: usar PID del proceso principal
+ps aux | grep taskmaster | grep -v grep
+kill -HUP <pid-taskmaster-principal>
+
+# Ejemplo práctico:
+# Si el proceso principal es PID 12099:
+kill -HUP 12099
 ```
+
+**⚠️ Importante**: Asegúrate de enviar la señal al **proceso principal** de taskmaster, NO a los procesos hijos gestionados. Si envías `kill -HUP` a un proceso hijo, este terminará y se reiniciará.
 
 **Comportamiento de recarga:**
 - ✅ Programas nuevos se inician si `autostart: true`
@@ -201,7 +242,31 @@ kill -HUP <pid-taskmaster>
 - [x] Manejo graceful de señales
 - [x] Estados de proceso detallados
 - [x] Logging de eventos completo
+- [x] **Interfaz web con dashboard en tiempo real**
+- [x] **WebSockets para actualizaciones instantáneas**
+- [x] **API REST para integración externa**
 - [x] Cleanup al salir
+
+## 🌐 Interfaz Web
+
+### Acceso a la interfaz web
+```bash
+# Iniciar con interfaz web
+./taskmaster --web-port=8080
+
+# Acceder desde el navegador
+http://localhost:8080
+```
+
+### Funcionalidades web
+- **Dashboard en tiempo real** con estado de todos los procesos
+- **Logs en vivo** con WebSockets
+- **Estadísticas dinámicas** (procesos activos/total)
+- **API REST** disponible en `/api/status`
+- **Interfaz responsive** para móviles
+- **Reconexión automática** si se pierde la conexión
+
+Para más detalles, consulta `README_WEB.md`
 
 ## 🧪 Pruebas
 
@@ -226,21 +291,41 @@ kill <pid>
 # Monitorear logs
 tail -f taskmaster.log
 
-# Probar recarga de configuración
-kill -HUP <taskmaster-pid>
+# Probar recarga de configuración con señal SIGHUP
+# IMPORTANTE: Usar el PID del proceso principal taskmaster, NO de los procesos hijos
+ps aux | grep taskmaster | grep -v grep  # Obtener PID del proceso principal
+kill -HUP <taskmaster-main-pid>
+# Ejemplo: si el proceso principal es PID 12099:
+kill -HUP 12099
+
+#para poder ver al mismo tiempo los logs cuando hacemos un kill directo al pid que cuando damos stop
+# Ver logs de stdout/stderr
+tail /tmp/logger.stdout
+
+# Probar interfaz web
+./taskmaster --web-port=8080
+# Luego abrir http://localhost:8080 en el navegador
 ```
 
 ## 🔧 Comandos Makefile
 
 ```bash
-make help          # Ver todos los comandos disponibles
-make build         # Compilar
-make run           # Compilar y ejecutar
-make clean         # Limpiar artifacts
-make deps          # Instalar dependencias
-make test          # Ejecutar tests
-make install       # Instalar en sistema
-make dev           # Modo desarrollo
+make help              # Ver todos los comandos disponibles
+make build             # Compilar el proyecto
+make run               # Compilar y ejecutar con configuración por defecto
+make run-config        # Ejecutar con configuración personalizada
+make run-web           # Ejecutar con interfaz web (puerto 8080)
+make run-web-config    # Ejecutar con web y configuración personalizada
+make clean             # Limpiar artifacts de construcción
+make deps              # Instalar dependencias (go mod download)
+make test              # Ejecutar tests
+make install           # Instalar en /usr/local/bin/
+make uninstall         # Desinstalar del sistema
+make dev               # Modo desarrollo (clean + build + create-config + run)
+make create-config     # Crear archivo de configuración de ejemplo
+make fmt               # Formatear código
+make lint              # Ejecutar linting (requiere golangci-lint)
+make check-tools       # Verificar herramientas requeridas
 ```
 
 ## 📝 Logging
