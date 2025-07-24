@@ -38,7 +38,7 @@ func (l *Logger) logf(level string, format string, args ...interface{}) {
 
 	// También mostrar en consola para debugging
 	fmt.Printf("[%s] %s: %s\n", timestamp, level, message)
-	
+
 	// Broadcast to WebSocket clients if broadcaster is available
 	if l.broadcaster != nil {
 		l.broadcaster.BroadcastLog(level, message, "taskmaster")
