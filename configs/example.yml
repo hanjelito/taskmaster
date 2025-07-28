@@ -118,3 +118,12 @@ programs:
     stderr: /dev/null
     workingdir: /tmp
     umask: "022"
+
+  # Programa que que no se detiene con stop, si no que usa sigkill para matar el proceso
+  test_sigkill:
+    cmd: 'bash -c "trap \"\" TERM; while true; do echo \"Ignoring SIGTERM...\"; sleep 1; done"'
+    stoptime: 10
+    stopsignal: TERM
+    autostart: true
+    numprocs: 1
+    startretries: 2

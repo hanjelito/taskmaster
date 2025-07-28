@@ -16,6 +16,7 @@ type Shell struct {
 	logger     *logger.Logger
 	rl         *readline.Instance
 	configFile string
+	shutdown   chan bool
 }
 
 func New(manager *process.Manager, logger *logger.Logger) *Shell {
@@ -25,9 +26,10 @@ func New(manager *process.Manager, logger *logger.Logger) *Shell {
 	}
 
 	return &Shell{
-		manager: manager,
-		logger:  logger,
-		rl:      rl,
+		manager:  manager,
+		logger:   logger,
+		rl:       rl,
+		shutdown: make(chan bool, 1),
 	}
 }
 
@@ -40,20 +42,48 @@ func (s *Shell) Run() {
 
 	fmt.Println("🚀 Taskmaster shell started. Type 'help' for available commands.")
 
+	inputChan := make(chan string)
+	errorChan := make(chan error)
+
+	// Goroutine para manejar la entrada del usuario
+	go func() {
+		for {
+			line, err := s.rl.Readline()
+			if err != nil {
+				errorChan <- err
+				return
+			}
+			inputChan <- line
+		}
+	}()
+
 	for {
-		line, err := s.rl.Readline()
-		if err != nil {
-			break
-		}
+		select {
+		case <-s.shutdown:
+			fmt.Println("\n🛑 Shutdown signal received, stopping shell...")
+			return
+		case err := <-errorChan:
+			if err != nil {
+				return
+			}
+		case line := <-inputChan:
+			line = strings.TrimSpace(line)
+			if line == "" {
+				continue
+			}
 
-		line = strings.TrimSpace(line)
-		if line == "" {
-			continue
+			if s.executeCommand(line) {
+				return // Comando quit/exit
+			}
 		}
+	}
+}
 
-		if s.executeCommand(line) {
-			break // Comando quit/exit
-		}
+func (s *Shell) Shutdown() {
+	s.rl.Close() // Esto hace que Readline() devuelva error
+	select {
+	case s.shutdown <- true:
+	default:
 	}
 }
 

@@ -62,12 +62,12 @@ func main() {
 	// Start periodic status checking
 	processManager.StartPeriodicStatusCheck()
 
-	// Handle SIGHUP for config reload
-	go handleSignals(processManager, appLogger, *configFile)
-
 	// Start interactive shell
 	shellInstance := shell.New(processManager, appLogger)
 	shellInstance.SetConfigFile(*configFile) // Pasar el archivo de configuración
+
+	// Handle SIGHUP for config reload
+	go handleSignals(processManager, appLogger, *configFile, shellInstance)
 
 	appLogger.Info("🎮 Starting interactive shell...")
 	shellInstance.Run()
@@ -86,7 +86,7 @@ func main() {
 	appLogger.Info("👋 Taskmaster shutdown complete")
 }
 
-func handleSignals(pm *process.Manager, logger *logger.Logger, configFile string) {
+func handleSignals(pm *process.Manager, logger *logger.Logger, configFile string, shell *shell.Shell) {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
 
@@ -100,9 +100,9 @@ func handleSignals(pm *process.Manager, logger *logger.Logger, configFile string
 				logger.Info("✅ Configuration reloaded via SIGHUP")
 			}
 		case syscall.SIGINT, syscall.SIGTERM:
-			logger.Info("📡 Received shutdown signal, stopping all processes...")
-			// El cleanup se hará en main() cuando termine el shell
-			os.Exit(0)
+			logger.Info("📡 Received shutdown signal, initiating graceful shutdown...")
+			shell.Shutdown()
+			return
 		}
 	}
 }
