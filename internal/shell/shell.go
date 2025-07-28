@@ -16,7 +16,6 @@ type Shell struct {
 	logger     *logger.Logger
 	rl         *readline.Instance
 	configFile string
-	shutdown   chan bool
 }
 
 func New(manager *process.Manager, logger *logger.Logger) *Shell {
@@ -26,10 +25,9 @@ func New(manager *process.Manager, logger *logger.Logger) *Shell {
 	}
 
 	return &Shell{
-		manager:  manager,
-		logger:   logger,
-		rl:       rl,
-		shutdown: make(chan bool, 1),
+		manager: manager,
+		logger:  logger,
+		rl:      rl,
 	}
 }
 
@@ -37,34 +35,15 @@ func (s *Shell) SetConfigFile(configFile string) {
 	s.configFile = configFile
 }
 
-func (s *Shell) Shutdown() {
-	// Cerrar readline para que devuelva error inmediatamente
-	s.rl.Close()
-	select {
-	case s.shutdown <- true:
-	default:
-	}
-}
-
 func (s *Shell) Run() {
 	defer s.rl.Close()
 
 	fmt.Println("🚀 Taskmaster shell started. Type 'help' for available commands.")
 
-	// Shell simple sin goroutines - más predecible
 	for {
-		// Verificar si tenemos señal de shutdown antes de cada prompt
-		select {
-		case <-s.shutdown:
-			fmt.Println("\n🛑 Shutdown signal received, stopping shell...")
-			return
-		default:
-		}
-
 		line, err := s.rl.Readline()
 		if err != nil {
-			// Si readline fue cerrado por Shutdown(), salir silenciosamente
-			return
+			break
 		}
 
 		line = strings.TrimSpace(line)
@@ -73,7 +52,7 @@ func (s *Shell) Run() {
 		}
 
 		if s.executeCommand(line) {
-			return // Comando quit/exit - salir inmediatamente
+			break // Comando quit/exit
 		}
 	}
 }

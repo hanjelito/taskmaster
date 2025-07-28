@@ -19,7 +19,10 @@ func (m *Manager) startProcessInstance(instance *ProcessInstance, programName st
 		return fmt.Errorf("failed to create command: %w", err)
 	}
 
-	m.configureCommand(cmd, instance)
+	// ahora puede fallar por privilege de-escalation
+	if err := m.configureCommand(cmd, instance); err != nil {
+		return fmt.Errorf("failed to configure command: %w", err)
+	}
 
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("failed to start command: %w", err)
@@ -58,11 +61,13 @@ func (m *Manager) validateUmask(umask string) error {
 }
 
 // configureCommand configura el comando con ambiente, directorio y redirecciones
-func (m *Manager) configureCommand(cmd *exec.Cmd, instance *ProcessInstance) {
+func (m *Manager) configureCommand(cmd *exec.Cmd, instance *ProcessInstance) error {
 	m.configureEnvironment(cmd, instance.Config.Env)
 	m.configureWorkingDir(cmd, instance.Config.WorkingDir)
-	m.configureRedirections(cmd, instance.Config.Stdout, instance.Config.Stderr)
-	m.configureProcessAttributes(cmd)
+	m.configureRedirections(cmd, instance)
+	
+	
+	return m.configureProcessAttributes(cmd, instance.Config)
 }
 
 // configureEnvironment configura las variables de ambiente
@@ -83,25 +88,84 @@ func (m *Manager) configureWorkingDir(cmd *exec.Cmd, workingDir string) {
 }
 
 // configureRedirections configura las redirecciones de stdout y stderr
-func (m *Manager) configureRedirections(cmd *exec.Cmd, stdout, stderr string) {
+func (m *Manager) configureRedirections(cmd *exec.Cmd, instance *ProcessInstance) {
+	stdout := instance.Config.Stdout
+	stderr := instance.Config.Stderr
+
 	if stdout != "" && stdout != "/dev/null" {
-		if file, err := os.OpenFile(stdout, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666); err == nil {
-			cmd.Stdout = file
+		if m.logBroadcaster != nil {
+			// Usar TeeWriter para escribir a archivo Y WebSocket
+			teeWriter, err := NewProcessTeeWriter(stdout, instance.Name, "stdout", m.logBroadcaster)
+			if err != nil {
+				m.logger.Error("Failed to create stdout TeeWriter for %s: %v", instance.Name, err)
+				// Fallback: redirección normal a archivo
+				if file, err := os.OpenFile(stdout, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666); err == nil {
+					cmd.Stdout = file
+				}
+			} else {
+				cmd.Stdout = teeWriter
+			}
+		} else {
+			// Sin broadcaster, redirección normal a archivo
+			if file, err := os.OpenFile(stdout, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666); err == nil {
+				cmd.Stdout = file
+			}
 		}
 	}
 
+	// ✅ CONFIGURAR STDERR con TeeWriter  
 	if stderr != "" && stderr != "/dev/null" {
-		if file, err := os.OpenFile(stderr, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666); err == nil {
-			cmd.Stderr = file
+		if m.logBroadcaster != nil {
+			// Usar TeeWriter para escribir a archivo Y WebSocket
+			teeWriter, err := NewProcessTeeWriter(stderr, instance.Name, "stderr", m.logBroadcaster)
+			if err != nil {
+				m.logger.Error("Failed to create stderr TeeWriter for %s: %v", instance.Name, err)
+				// Fallback: redirección normal a archivo
+				if file, err := os.OpenFile(stderr, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666); err == nil {
+					cmd.Stderr = file
+				}
+			} else {
+				cmd.Stderr = teeWriter
+			}
+		} else {
+			// Sin broadcaster, redirección normal a archivo
+			if file, err := os.OpenFile(stderr, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666); err == nil {
+				cmd.Stderr = file
+			}
 		}
 	}
 }
 
 // configureProcessAttributes configura los atributos del proceso
-func (m *Manager) configureProcessAttributes(cmd *exec.Cmd) {
+func (m *Manager) configureProcessAttributes(cmd *exec.Cmd, config *ProcessConfig) error {
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setpgid: true,
 	}
+
+	// APLICAR PRIVILEGE DE-ESCALATION
+	if config.User != "" {
+		creds, err := LookupUser(config.User, config.Group)
+		if err != nil {
+			return fmt.Errorf("privilege de-escalation failed: %w", err)
+		}
+
+		if creds != nil {
+			m.logger.Info("De-escalating privilege for process: user=%s(%d) group=%s(%d)", 
+				config.User, creds.UID, getGroupName(config.Group, creds.GID), creds.GID)
+			
+			ApplyCredentials(cmd.SysProcAttr, creds)
+		}
+	}
+
+	return nil
+}
+
+// getGroupName obtiene el nombre del grupo para logging
+func getGroupName(groupName string, gid uint32) string {
+	if groupName != "" {
+		return groupName
+	}
+	return fmt.Sprintf("gid:%d", gid)
 }
 
 // stopProcessInstance detiene una instancia específica de proceso

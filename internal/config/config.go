@@ -25,6 +25,8 @@ type Program struct {
 	Env          map[string]string `yaml:"env"`          // environment variables
 	WorkingDir   string            `yaml:"workingdir"`   // working directory
 	Umask        string            `yaml:"umask"`        // umask for process
+	User         string            `yaml:"user"`         // user to run process as
+	Group        string            `yaml:"group"`        // group to run process as
 }
 
 func Load(filename string) (*Config, error) {

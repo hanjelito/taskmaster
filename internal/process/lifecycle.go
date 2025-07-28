@@ -65,6 +65,8 @@ func (m *Manager) createProcessConfig(program config.Program) *ProcessConfig {
 		Env:          program.Env,
 		WorkingDir:   program.WorkingDir,
 		Umask:        program.Umask,
+		User:         program.User,
+		Group:        program.Group,
 	}
 }
 

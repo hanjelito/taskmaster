@@ -1,0 +1,40 @@
+programs:
+  # Proceso normal sin de-escalation
+  test_program:
+    cmd: "sleep 30"
+    numprocs: 2
+    autostart: true
+    autorestart: unexpected
+    exitcodes: [0]
+
+  # Proceso con de-escalation a usuario específico
+  web_server:
+    cmd: "python3 -m http.server 8001"
+    numprocs: 1
+    autostart: true
+    autorestart: unexpected
+    user: "nobody"          # ← Corre como usuario 'nobody'
+    group: "nogroup"        # ← Corre como grupo 'nogroup'
+    workingdir: /tmp
+    stdout: /tmp/webserver.stdout
+    stderr: /tmp/webserver.stderr
+
+  # Proceso con solo usuario (grupo automático)
+  logger_program:
+    cmd: "bash -c 'while true; do echo \"Log: $(date) - Running as $(whoami) (UID=$(id -u))\" ; sleep 5; done'"
+    numprocs: 1
+    autostart: true
+    autorestart: unexpected
+    user: "daemon"          # ← Solo usuario, grupo será el primario de 'daemon'
+    stdout: /tmp/logger.stdout
+    stderr: /tmp/logger.stderr
+
+  # Proceso crítico sin de-escalation (corre como root)
+  system_monitor:
+    cmd: "bash -c 'while true; do echo \"System monitor: $(date) - Running as $(whoami) (UID=$(id -u))\" ; sleep 10; done'"
+    numprocs: 1
+    autostart: true
+    autorestart: always
+    # Sin user/group = corre como el usuario actual (root si taskmaster se inició como root)
+    stdout: /tmp/monitor.stdout
+    stderr: /tmp/monitor.stderr

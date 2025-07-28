@@ -11,9 +11,11 @@ import (
 // NewManager crea un nuevo gestor de procesos
 func NewManager(cfg *config.Config, logger *logger.Logger) *Manager {
 	return &Manager{
-		processes: make(map[string][]*ProcessInstance),
-		config:    cfg,
-		logger:    logger,
+		processes:      make(map[string][]*ProcessInstance),
+		config:         cfg,
+		logger:         logger,
+		broadcaster:    nil,	
+		logBroadcaster: nil, // Se configurará después
 	}
 }
 
@@ -22,6 +24,9 @@ func (m *Manager) SetStatusBroadcaster(broadcaster StatusBroadcaster) {
 	m.broadcaster = broadcaster
 }
 
+func (m *Manager) SetLogBroadcaster(broadcaster LogBroadcaster) {
+	m.logBroadcaster = broadcaster
+}
 // broadcastStatus envía el estado actual de todos los procesos si hay un broadcaster configurado
 func (m *Manager) broadcastStatus() {
 	if m.broadcaster != nil {

@@ -13,6 +13,9 @@ type StatusBroadcaster interface {
 	BroadcastStatus(status interface{})
 }
 
+type LogBroadcaster interface {
+	BroadcastLog(level, message, program string)
+}
 // Manager gestiona múltiples procesos y sus instancias
 type Manager struct {
 	processes   map[string][]*ProcessInstance
@@ -20,6 +23,7 @@ type Manager struct {
 	logger      *logger.Logger
 	mutex       sync.RWMutex
 	broadcaster StatusBroadcaster
+	logBroadcaster LogBroadcaster
 }
 
 // ProcessInstance representa una instancia específica de un proceso
@@ -83,4 +87,6 @@ type ProcessConfig struct {
 	Env          map[string]string
 	WorkingDir   string
 	Umask        string
+	User         string
+	Group        string
 }
