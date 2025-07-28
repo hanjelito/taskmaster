@@ -118,3 +118,36 @@ programs:
     stderr: /dev/null
     workingdir: /tmp
     umask: "022"
+
+  # Programa para testear umask - crea archivos con diferentes permisos
+  umask_test:
+    cmd: 'bash -c "echo \"Testing umask\"; touch /tmp/umask_test_file_$$; mkdir -p /tmp/umask_test_dir_$$; echo \"File and dir created with PID $$\"; sleep 30"'
+    numprocs: 1
+    autostart: false
+    autorestart: never
+    exitcodes: [0]
+    starttime: 2
+    startretries: 1
+    stopsignal: TERM
+    stoptime: 5
+    stdout: /tmp/umask_test.stdout
+    stderr: /tmp/umask_test.stderr
+    workingdir: /tmp
+    umask: "077"
+    # Solo el owner puede leer/escribir/ejecutar
+    # Con umask "077":
+    # - Archivos: 600 (-rw-------)
+    # - Directorios: 700 (drwx------)
+
+    # Con umask "022":
+    # - Archivos: 644 (-rw-r--r--)
+    # - Directorios: 755 (drwxr-xr-x)
+
+  # Programa que que no se detiene con stop, si no que usa sigkill para matar el proceso
+  test_sigkill:
+    cmd: 'bash -c "trap \"\" TERM; while true; do echo \"Ignoring SIGTERM...\"; sleep 1; done"'
+    stoptime: 10
+    stopsignal: TERM
+    autostart: false
+    numprocs: 1
+    startretries: 2

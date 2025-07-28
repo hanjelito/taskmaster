@@ -146,7 +146,8 @@ func handleDaemonSignals(pm *process.Manager, logger *logger.Logger, configFile 
 			}
 		case syscall.SIGINT, syscall.SIGTERM:
 			logger.Info("📡 Received shutdown signal, stopping daemon...")
-			os.Exit(0)
+			shell.Shutdown()
+			return
 		}
 	}
 }
@@ -165,9 +166,9 @@ func handleSignals(pm *process.Manager, logger *logger.Logger, configFile string
 				logger.Info("✅ Configuration reloaded via SIGHUP")
 			}
 		case syscall.SIGINT, syscall.SIGTERM:
-			logger.Info("📡 Received shutdown signal, stopping all processes...")
-			// El cleanup se hará en main() cuando termine el shell
-			os.Exit(0)
+			logger.Info("📡 Received shutdown signal, initiating graceful shutdown...")
+			shell.Shutdown()
+			return
 		}
 	}
 }
