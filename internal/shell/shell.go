@@ -37,53 +37,44 @@ func (s *Shell) SetConfigFile(configFile string) {
 	s.configFile = configFile
 }
 
+func (s *Shell) Shutdown() {
+	// Cerrar readline para que devuelva error inmediatamente
+	s.rl.Close()
+	select {
+	case s.shutdown <- true:
+	default:
+	}
+}
+
 func (s *Shell) Run() {
 	defer s.rl.Close()
 
 	fmt.Println("🚀 Taskmaster shell started. Type 'help' for available commands.")
 
-	inputChan := make(chan string)
-	errorChan := make(chan error)
-
-	// Goroutine para manejar la entrada del usuario
-	go func() {
-		for {
-			line, err := s.rl.Readline()
-			if err != nil {
-				errorChan <- err
-				return
-			}
-			inputChan <- line
-		}
-	}()
-
+	// Shell simple sin goroutines - más predecible
 	for {
+		// Verificar si tenemos señal de shutdown antes de cada prompt
 		select {
 		case <-s.shutdown:
 			fmt.Println("\n🛑 Shutdown signal received, stopping shell...")
 			return
-		case err := <-errorChan:
-			if err != nil {
-				return
-			}
-		case line := <-inputChan:
-			line = strings.TrimSpace(line)
-			if line == "" {
-				continue
-			}
-
-			if s.executeCommand(line) {
-				return // Comando quit/exit
-			}
+		default:
 		}
-	}
-}
 
-func (s *Shell) Shutdown() {
-	s.rl.Close() // Esto hace que Readline() devuelva error
-	select {
-	case s.shutdown <- true:
-	default:
+		line, err := s.rl.Readline()
+		if err != nil {
+			// Si readline fue cerrado por Shutdown(), salir silenciosamente
+			return
+		}
+
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+
+		if s.executeCommand(line) {
+			return // Comando quit/exit - salir inmediatamente
+		}
 	}
 }
 

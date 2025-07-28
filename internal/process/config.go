@@ -57,13 +57,19 @@ func (m *Manager) handleNewProgram(name string, program config.Program) error {
 // handleModifiedProgram maneja un programa modificado
 func (m *Manager) handleModifiedProgram(name string, oldProgram, newProgram config.Program) error {
 	if !m.programsEqual(oldProgram, newProgram) {
-		m.logger.Info("Program %s configuration changed, restarting", name)
+		m.logger.Info("Program %s configuration changed", name)
 
-		if err := m.stopProgramUnsafe(name); err != nil {
-			return fmt.Errorf("failed to stop program for restart: %w", err)
+		// Solo intentar detener si el programa existe y está corriendo
+		if instances, exists := m.processes[name]; exists && len(instances) > 0 {
+			m.logger.Info("Stopping program %s for restart", name)
+			if err := m.stopProgramUnsafe(name); err != nil {
+				return fmt.Errorf("failed to stop program for restart: %w", err)
+			}
 		}
 
+		// Iniciar si autostart está habilitado
 		if newProgram.AutoStart {
+			m.logger.Info("Starting program %s with new configuration", name)
 			return m.startProgramUnsafe(name)
 		}
 	}
@@ -74,6 +80,7 @@ func (m *Manager) handleModifiedProgram(name string, oldProgram, newProgram conf
 func (m *Manager) programsEqual(old, new config.Program) bool {
 	return old.Cmd == new.Cmd &&
 		old.NumProcs == new.NumProcs &&
+		old.AutoStart == new.AutoStart &&
 		old.AutoRestart == new.AutoRestart &&
 		old.StopSignal == new.StopSignal &&
 		old.StopTime == new.StopTime &&
