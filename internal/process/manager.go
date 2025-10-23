@@ -35,7 +35,7 @@ func (m *Manager) StartPeriodicStatusCheck() {
 	go func() {
 		ticker := time.NewTicker(5 * time.Second)
 		defer ticker.Stop()
-		
+
 		for range ticker.C {
 			m.checkProcessStatus()
 		}
@@ -46,39 +46,50 @@ func (m *Manager) StartPeriodicStatusCheck() {
 func (m *Manager) checkProcessStatus() {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-	
+
 	statusChanged := false
-	
 	for programName, instances := range m.processes {
 		for _, instance := range instances {
-			if instance.State == StateRunning && instance.Cmd != nil && instance.Cmd.Process != nil {
-				// Verificar si el proceso sigue vivo enviando señal 0
-				if err := instance.Cmd.Process.Signal(syscall.Signal(0)); err != nil {
-					// El proceso ya no existe
-					m.logger.Info("Process %s (PID %d) was killed externally", instance.Name, instance.PID)
-					instance.State = StateStopped
-					statusChanged = true
-					
-					// Intentar reiniciar si es necesario
-					if m.shouldRestart(instance, 143) && instance.RestartCount < instance.Config.StartRetries {
-						m.logger.Info("Attempting to restart externally killed process %s", instance.Name)
-						go func(inst *ProcessInstance, progName string) {
-							time.Sleep(time.Second)
-							m.mutex.Lock()
-							defer m.mutex.Unlock()
-							if err := m.startProcessInstance(inst, progName); err != nil {
-								m.logger.Error("Failed to restart process %s: %v", inst.Name, err)
-								inst.State = StateFailed
-								m.broadcastStatus()
-							}
-						}(instance, programName)
-					}
-				}
+			if m.isProcessDead(instance) {
+				statusChanged = true
+				m.handleDeadProcess(instance, programName)
 			}
 		}
 	}
-	
+
 	if statusChanged {
+		m.broadcastStatus()
+	}
+}
+
+// isProcessDead verifica si un proceso ha muerto
+func (m *Manager) isProcessDead(instance *ProcessInstance) bool {
+	return instance.State == StateRunning &&
+		instance.Cmd != nil &&
+		instance.Cmd.Process != nil &&
+		instance.Cmd.Process.Signal(syscall.Signal(0)) != nil
+}
+
+// handleDeadProcess maneja un proceso que ha muerto externamente
+func (m *Manager) handleDeadProcess(instance *ProcessInstance, programName string) {
+	m.logger.Info("Process %s (PID %d) was killed externally", instance.Name, instance.PID)
+	instance.State = StateStopped
+
+	if m.shouldRestart(instance, 143) && instance.RestartCount < instance.Config.StartRetries {
+		m.logger.Info("Attempting to restart externally killed process %s", instance.Name)
+		go m.restartProcess(instance, programName)
+	}
+}
+
+// restartProcess reinicia un proceso de forma asíncrona
+func (m *Manager) restartProcess(instance *ProcessInstance, programName string) {
+	time.Sleep(time.Second)
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
+	if err := m.startProcessInstance(instance, programName); err != nil {
+		m.logger.Error("Failed to restart process %s: %v", instance.Name, err)
+		instance.State = StateFailed
 		m.broadcastStatus()
 	}
 }

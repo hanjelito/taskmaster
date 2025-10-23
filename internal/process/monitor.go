@@ -12,7 +12,7 @@ func (m *Manager) monitorProcess(instance *ProcessInstance, programName string) 
 
 	if instance.Cmd.ProcessState == nil {
 		instance.State = StateRunning
-		m.logger.Info("Process %s successfully started and running", instance.Name)
+		m.logger.Info("Process %s successfully started and running in new PID %d", instance.Name, instance.PID)
 		m.broadcastStatus()
 	}
 
