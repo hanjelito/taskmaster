@@ -20,7 +20,7 @@ programs:
 
   # Programa que genera output
   logger_program:
-    cmd: "bash -c 'trap \"echo RECEIVED SIGTERM at $(date); exit 143\" TERM; while true; do echo \"Log message at $(date)\"; sleep 5; done'"
+    cmd: "bash -c 'trap \"echo RECEIVED SIGTERM at $(date) >&2; exit 143\" TERM; trap \"echo RECEIVED SIGINT at $(date) >&2; exit 130\" INT; trap \"echo RECEIVED SIGHUP at $(date) >&2; exit 129\" HUP; while true; do echo \"Log message at $(date)\"; echo \"Error message at $(date)\" >&2; sleep 5; done'"
     numprocs: 1
     autostart: true
     autorestart: unexpected
@@ -73,7 +73,7 @@ programs:
 
   # Programa con señal personalizada
   custom_signal_program:
-    cmd: "bash -c 'trap \"echo Received USR1; exit 0\" USR1; echo \"Started with PID $$\"; while true; do sleep 1; done'"
+    cmd: "bash -c 'trap \"echo Received USR1; exit 0\" USR1; echo \"RECEIVED USR1 kill with PID $$\" >&2; while true; do sleep 1; done'"
     numprocs: 1
     autostart: false
     autorestart: unexpected
