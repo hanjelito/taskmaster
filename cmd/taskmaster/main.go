@@ -59,9 +59,6 @@ func main() {
 		appLogger.Error("Failed to start some processes: %v", err)
 	}
 
-	// Start periodic status checking
-	processManager.StartPeriodicStatusCheck()
-
 	// Start interactive shell
 	shellInstance := shell.New(processManager, appLogger)
 	shellInstance.SetConfigFile(*configFile) // Pasar el archivo de configuración

@@ -1,75 +1,50 @@
-[2025-10-24 22:27:49] ERROR: Process logger_program_0 exited with code 143
-[2025-10-24 22:27:49] INFO: Restarting process logger_program_0 (attempt 1/5)
-[2025-10-24 22:27:52] INFO: Process logger_program_0 successfully started and running in new PID 3769
-[2025-10-24 22:28:10] ERROR: Process logger_program_0 exited with code 129
-[2025-10-24 22:28:10] INFO: Restarting process logger_program_0 (attempt 2/5)
-[2025-10-24 22:28:13] INFO: Process logger_program_0 successfully started and running in new PID 3809
-[2025-10-24 22:30:02] INFO: Process logger_program_0 exited normally
-[2025-10-24 22:30:02] INFO: Process logger_program_0 terminated naturally with expected code 0
-[2025-10-24 22:33:17] INFO: Auto-cleaned 1 dead instances for program logger_program
-[2025-10-24 22:33:17] INFO: Started process logger_program_0 (PID: 4047)
-[2025-10-24 22:33:19] INFO: Process logger_program_0 successfully started and running in new PID 4047
-[2025-10-24 22:33:37] INFO: Process logger_program_0 exited normally
-[2025-10-24 22:33:37] INFO: Process logger_program_0 terminated naturally with expected code 0
-[2025-10-24 22:34:18] INFO: Auto-cleaned 1 dead instances for program logger_program
-[2025-10-24 22:34:18] INFO: Started process logger_program_0 (PID: 4087)
-[2025-10-24 22:34:20] INFO: Process logger_program_0 successfully started and running in new PID 4087
-[2025-10-24 22:34:30] ERROR: Process logger_program_0 exited with code 159
-[2025-10-24 22:34:30] INFO: Restarting process logger_program_0 (attempt 1/5)
-[2025-10-24 22:34:33] INFO: Process logger_program_0 successfully started and running in new PID 4119
-[2025-10-24 22:46:58] INFO: Started process flaky_program_0 (PID: 5102)
-[2025-10-24 22:46:59] INFO: Process flaky_program_0 successfully started and running in new PID 5102
-[2025-10-24 22:46:59] ERROR: Process flaky_program_0 exited with code 1
-[2025-10-24 22:46:59] INFO: Restarting process flaky_program_0 (attempt 1/3)
-[2025-10-24 22:47:01] INFO: Process flaky_program_0 successfully started and running in new PID 5105
-[2025-10-24 22:47:01] INFO: Process flaky_program_0 exited normally
-[2025-10-24 22:47:01] INFO: Process flaky_program_0 terminated naturally with expected code 0
-[2025-10-24 22:47:56] INFO: Started process custom_signal_program_0 (PID: 5183)
-[2025-10-24 22:47:59] INFO: Process custom_signal_program_0 successfully started and running in new PID 5183
-[2025-10-24 22:48:10] ERROR: Process custom_signal_program_0 exited with code 159
-[2025-10-24 22:48:10] INFO: Restarting process custom_signal_program_0 (attempt 1/2)
-[2025-10-24 22:48:14] INFO: Process custom_signal_program_0 successfully started and running in new PID 5217
-[2025-10-24 22:48:36] ERROR: Process custom_signal_program_0 exited with code 159
-[2025-10-24 22:48:36] INFO: Restarting process custom_signal_program_0 (attempt 2/2)
-[2025-10-24 22:48:40] INFO: Process custom_signal_program_0 successfully started and running in new PID 5275
-[2025-10-24 22:50:32] ERROR: Process custom_signal_program_0 exited with code 159
-[2025-10-24 22:50:32] ERROR: Process custom_signal_program_0 failed too many times, giving up
-[2025-10-24 22:50:49] INFO: Auto-cleaned 1 dead instances for program custom_signal_program
-[2025-10-24 22:50:49] INFO: Started process custom_signal_program_0 (PID: 5555)
-[2025-10-24 22:50:52] INFO: Process custom_signal_program_0 successfully started and running in new PID 5555
-[2025-10-24 22:51:21] INFO: Process custom_signal_program_0 exited normally
-[2025-10-24 22:51:21] INFO: Process custom_signal_program_0 terminated naturally with expected code 0
-[2025-10-24 22:55:39] INFO: Program logger_program configuration changed
-[2025-10-24 22:55:39] INFO: Stopping program logger_program for restart
-[2025-10-24 22:55:39] INFO: Stopping process logger_program_0 with signal TERM (timeout: 15s)
-[2025-10-24 22:55:43] INFO: Process logger_program_0 stopped gracefully
-[2025-10-24 22:55:43] INFO: Successfully stopped 1 process(es) for program logger_program
-[2025-10-24 22:55:43] INFO: Starting program logger_program with new configuration
-[2025-10-24 22:55:43] INFO: Auto-cleaned 1 dead instances for program logger_program
-[2025-10-24 22:55:43] INFO: Started process logger_program_0 (PID: 5977)
-[2025-10-24 22:55:43] INFO: Program custom_signal_program configuration changed
-[2025-10-24 22:55:43] INFO: Stopping program custom_signal_program for restart
-[2025-10-24 22:55:43] INFO: Process custom_signal_program_0 already finished, no need to stop
-[2025-10-24 22:55:43] INFO: Configuration reloaded successfully
-[2025-10-24 22:55:45] INFO: Process logger_program_0 successfully started and running in new PID 5977
-[2025-10-24 22:55:48] INFO: Configuration reloaded successfully
-[2025-10-24 22:56:03] INFO: Auto-cleaned 1 dead instances for program custom_signal_program
-[2025-10-24 22:56:03] INFO: Started process custom_signal_program_0 (PID: 6006)
-[2025-10-24 22:56:06] INFO: Process custom_signal_program_0 successfully started and running in new PID 6006
-[2025-10-24 22:56:18] INFO: Process custom_signal_program_0 exited normally
-[2025-10-24 22:56:18] INFO: Process custom_signal_program_0 terminated naturally with expected code 0
-[2025-10-24 23:02:14] INFO: Program logger_program configuration changed
-[2025-10-24 23:02:14] INFO: Stopping program logger_program for restart
-[2025-10-24 23:02:14] INFO: Stopping process logger_program_0 with signal TERM (timeout: 15s)
-[2025-10-24 23:02:16] INFO: Process logger_program_0 stopped gracefully
-[2025-10-24 23:02:16] INFO: Successfully stopped 1 process(es) for program logger_program
-[2025-10-24 23:02:16] INFO: Starting program logger_program with new configuration
-[2025-10-24 23:02:16] INFO: Auto-cleaned 1 dead instances for program logger_program
-[2025-10-24 23:02:16] INFO: Started process logger_program_0 (PID: 6484)
-[2025-10-24 23:02:16] INFO: Program custom_signal_program configuration changed
-[2025-10-24 23:02:16] INFO: Stopping program custom_signal_program for restart
-[2025-10-24 23:02:16] INFO: Process custom_signal_program_0 already finished, no need to stop
-[2025-10-24 23:02:16] INFO: Configuration reloaded successfully
-[2025-10-24 23:02:18] INFO: Process logger_program_0 successfully started and running in new PID 6484
-[2025-10-24 23:02:36] INFO: Process logger_program_0 exited normally
-[2025-10-24 23:02:36] INFO: Process logger_program_0 terminated naturally with expected code 0
+[2025-10-25 00:12:01] INFO: 🚀 Starting Taskmaster...
+[2025-10-25 00:12:01] INFO: ✅ Configuration loaded from configs/example.yml
+[2025-10-25 00:12:01] INFO: Started process worker_pool_0 (PID: 9774)
+[2025-10-25 00:12:01] INFO: Started process worker_pool_1 (PID: 9775)
+[2025-10-25 00:12:01] INFO: Started process worker_pool_2 (PID: 9776)
+[2025-10-25 00:12:01] INFO: Started process worker_pool_3 (PID: 9777)
+[2025-10-25 00:12:01] INFO: Started process test_program_0 (PID: 9778)
+[2025-10-25 00:12:01] INFO: Started process test_program_1 (PID: 9779)
+[2025-10-25 00:12:01] INFO: Started process logger_program_0 (PID: 9780)
+[2025-10-25 00:12:01] INFO: 🎮 Starting interactive shell...
+[2025-10-25 00:12:03] INFO: Process worker_pool_0 successfully started and running in new PID 9774
+[2025-10-25 00:12:03] INFO: Process worker_pool_1 successfully started and running in new PID 9775
+[2025-10-25 00:12:03] INFO: Process worker_pool_2 successfully started and running in new PID 9776
+[2025-10-25 00:12:03] INFO: Process worker_pool_3 successfully started and running in new PID 9777
+[2025-10-25 00:12:03] INFO: Process logger_program_0 successfully started and running in new PID 9780
+[2025-10-25 00:12:04] INFO: Process test_program_0 successfully started and running in new PID 9778
+[2025-10-25 00:12:04] INFO: Process test_program_1 successfully started and running in new PID 9779
+[2025-10-25 00:12:11] INFO: Process worker_pool_3 exited normally
+[2025-10-25 00:12:11] INFO: Process worker_pool_3 terminated naturally with expected code 0
+[2025-10-25 00:12:12] INFO: Process worker_pool_0 exited normally
+[2025-10-25 00:12:12] INFO: Process worker_pool_0 terminated naturally with expected code 0
+[2025-10-25 00:12:21] INFO: Process worker_pool_2 exited normally
+[2025-10-25 00:12:21] INFO: Process worker_pool_2 terminated naturally with expected code 0
+[2025-10-25 00:12:23] INFO: Process worker_pool_1 exited normally
+[2025-10-25 00:12:23] INFO: Process worker_pool_1 terminated naturally with expected code 0
+[2025-10-25 00:12:31] INFO: Process test_program_0 exited normally
+[2025-10-25 00:12:31] INFO: Process test_program_0 terminated naturally with expected code 0
+[2025-10-25 00:12:31] INFO: Process test_program_1 exited normally
+[2025-10-25 00:12:31] INFO: Process test_program_1 terminated naturally with expected code 0
+[2025-10-25 00:12:56] ERROR: Process logger_program_0 exited with code 143
+[2025-10-25 00:12:56] INFO: Restarting process logger_program_0 (attempt 1/5)
+[2025-10-25 00:12:59] INFO: Process logger_program_0 successfully started and running in new PID 9886
+[2025-10-25 00:13:46] INFO: Started process custom_signal_program_0 (PID: 9957)
+[2025-10-25 00:13:49] INFO: Process custom_signal_program_0 successfully started and running in new PID 9957
+[2025-10-25 00:14:00] ERROR: Process custom_signal_program_0 exited with code 143
+[2025-10-25 00:14:00] INFO: Restarting process custom_signal_program_0 (attempt 1/2)
+[2025-10-25 00:14:04] INFO: Process custom_signal_program_0 successfully started and running in new PID 9996
+[2025-10-25 00:14:24] INFO: Process custom_signal_program_0 exited normally
+[2025-10-25 00:14:24] INFO: Process custom_signal_program_0 terminated naturally with expected code 0
+[2025-10-25 00:14:51] INFO: Auto-cleaned 1 dead instances for program custom_signal_program
+[2025-10-25 00:14:51] INFO: Started process custom_signal_program_0 (PID: 10104)
+[2025-10-25 00:14:54] INFO: Process custom_signal_program_0 successfully started and running in new PID 10104
+[2025-10-25 00:17:22] ERROR: Process custom_signal_program_0 exited with code 143
+[2025-10-25 00:17:22] INFO: Restarting process custom_signal_program_0 (attempt 1/2)
+[2025-10-25 00:17:26] INFO: Process custom_signal_program_0 successfully started and running in new PID 10456
+[2025-10-25 00:18:01] ERROR: Process custom_signal_program_0 exited with code 129
+[2025-10-25 00:18:01] INFO: Restarting process custom_signal_program_0 (attempt 2/2)
+[2025-10-25 00:18:05] INFO: Process custom_signal_program_0 successfully started and running in new PID 10547
+[2025-10-25 00:18:38] ERROR: Process custom_signal_program_0 exited with code 129
+[2025-10-25 00:18:38] ERROR: Process custom_signal_program_0 failed too many times, giving up
