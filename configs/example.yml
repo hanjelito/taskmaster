@@ -26,7 +26,7 @@ programs:
     autorestart: unexpected
     exitcodes: [0]
     starttime: 2
-    startretries: 5
+    startretries: 2
     stopsignal: TERM
     stoptime: 15
     stdout: /tmp/logger.stdout
@@ -55,7 +55,7 @@ programs:
   # Programa con múltiples procesos
   worker_pool:
     cmd: "bash -c 'echo \"Worker $$ started\"; sleep $((10 + RANDOM % 20)); echo \"Worker $$ finished\"'"
-    numprocs: 4
+    numprocs: 2
     autostart: true
     autorestart: never
     exitcodes: [0]
@@ -74,7 +74,7 @@ programs:
   # Programa con señal personalizada
   custom_signal_program:
     cmd: "bash -c 'trap \"echo Received USR1; exit 0\" USR1; echo \"RECEIVED USR1 kill with PID $$\" >&2; while true; do sleep 1; done'"
-    numprocs: 1
+    numprocs: 2
     autostart: false
     autorestart: unexpected
     exitcodes: [0]

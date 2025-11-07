@@ -128,7 +128,7 @@ func (s *Shell) executeCommand(line string) bool {
 }
 
 func (s *Shell) showHelp() {
-	fmt.Println("📚 Available commands:")
+	fmt.Println("Available commands:")
 	fmt.Println("  help     - Show this help message")
 	fmt.Println("  status   - Show status of all programs")
 	fmt.Println("  start    - Start a program")
@@ -142,7 +142,7 @@ func (s *Shell) showHelp() {
 func (s *Shell) showStatus() {
 	status := s.manager.GetStatus()
 	if len(status) == 0 {
-		fmt.Println("📋 No programs configured")
+		fmt.Println("No programs configured")
 		return
 	}
 

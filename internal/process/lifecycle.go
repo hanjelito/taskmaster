@@ -8,6 +8,7 @@ import (
 
 // startProgramUnsafe inicia un programa sin bloquear (asume que ya se tiene el lock)
 func (m *Manager) startProgramUnsafe(name string) error {
+	// existis es el programa está en la configuración actual esto lo sacamos de m.config
 	program, exists := m.config.Programs[name]
 	if !exists {
 		return fmt.Errorf("program %s not found in configuration", name)

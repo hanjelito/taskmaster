@@ -1,0 +1,24 @@
+# Binarios compilados
+taskmaster
+
+# Logs
+*.log
+taskmaster.log
+
+# Archivos del sistema
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Directorios de IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Archivos de test temporales
+/tmp/
+*.tmp

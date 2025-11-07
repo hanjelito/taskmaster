@@ -26,7 +26,7 @@ func main() {
 	}
 	defer appLogger.Close()
 
-	appLogger.Info("🚀 Starting Taskmaster...")
+	appLogger.Info("Starting Taskmaster...")
 
 	// Load configuration
 	cfg, err := config.Load(*configFile)
@@ -83,6 +83,7 @@ func main() {
 	appLogger.Info("👋 Taskmaster shutdown complete")
 }
 
+// handleSignals maneja las señales del sistema para recargar configuración y apagar
 func handleSignals(pm *process.Manager, logger *logger.Logger, configFile string, shell *shell.Shell) {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)

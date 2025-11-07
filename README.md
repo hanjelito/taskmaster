@@ -12,26 +12,12 @@ Taskmaster es un sistema de gestión de procesos que permite:
 - **Interfaz web con WebSockets** para monitoreo en tiempo real
 - Logging completo de eventos
 
-## 🛠️ Instalación
-
-### Prerrequisitos
-- Go 1.21 o superior
-- Sistema Unix/Linux (probado en Ubuntu, macOS)
-
-### Compilación
-```bash
-# Clonar el repositorio
-git clone <repository-url>
-cd taskmaster
 
 # Instalar dependencias
 make deps
 
 # Compilar
 make build
-
-# O usar el script de construcción
-make build-script
 
 # Instalar en el sistema (opcional)
 make install
@@ -109,11 +95,18 @@ taskmaster/
 │   └── main.go
 ├── internal/                # Código interno
 │   ├── config/             # Gestión de configuración
-│   │   └── config.go
+│   │   ├── loader.go
+│   │   └── types.go
 │   ├── logger/             # Sistema de logging
 │   │   └── logger.go
 │   ├── process/            # Gestión de procesos
-│   │   └── manager.go
+│   │   ├── manager.go
+│   │   ├── instance.go
+│   │   ├── lifecycle.go
+│   │   ├── monitor.go
+│   │   ├── reload.go
+│   │   ├── helpers.go
+│   │   └── types.go
 │   ├── shell/              # Shell interactivo
 │   │   └── shell.go
 │   └── web/                # Servidor web y WebSockets
@@ -126,8 +119,7 @@ taskmaster/
 ├── configs/                # Archivos de configuración
 │   ├── example.yml
 │   └── test.yml
-├── scripts/                # Scripts auxiliares
-│   └── build.go
+├── .gitignore             # Archivos ignorados por git
 ├── Makefile               # Comandos de construcción
 ├── go.mod                 # Dependencias Go
 └── README.md

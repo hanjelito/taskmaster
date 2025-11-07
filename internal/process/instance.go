@@ -141,9 +141,9 @@ func (m *Manager) stopProcessInstance(instance *ProcessInstance) bool {
 	}
 
 	instance.State = StateStopped
-	
+
 	// Broadcast status update
 	m.broadcastStatus()
-	
+
 	return true
 }

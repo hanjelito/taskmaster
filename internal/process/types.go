@@ -24,16 +24,16 @@ type Manager struct {
 
 // ProcessInstance representa una instancia específica de un proceso
 type ProcessInstance struct {
-	Name         string       `json:"name"`
-	Config       *ProcessConfig `json:"-"`
-	Cmd          *exec.Cmd    `json:"-"`
-	PID          int          `json:"pid"`
-	State        ProcessState `json:"state"`
-	StartTime    time.Time    `json:"start_time"`
-	ExitCode     int          `json:"exit_code"`
-	RestartCount int          `json:"restart_count"`
-	StopChan     chan bool    `json:"-"`
-	ManualStop   bool         `json:"manual_stop"`
+	Name         string         `json:"name"`          // Nombre del programa
+	Config       *ProcessConfig `json:"-"`             // Configuración del proceso
+	Cmd          *exec.Cmd      `json:"-"`             // Comando en ejecución
+	PID          int            `json:"pid"`           // ID del proceso
+	State        ProcessState   `json:"state"`         // Estado del proceso
+	StartTime    time.Time      `json:"start_time"`    // Hora de inicio
+	ExitCode     int            `json:"exit_code"`     // Código de salida
+	RestartCount int            `json:"restart_count"` // Contador de reinicios
+	StopChan     chan bool      `json:"-"`             // Canal para detener el proceso
+	ManualStop   bool           `json:"manual_stop"`   // Indica si el proceso fue detenido manualmente
 }
 
 // ProcessState representa el estado actual de un proceso
